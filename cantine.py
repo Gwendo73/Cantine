@@ -23,6 +23,8 @@ def close_connection(exception):
 
 @app.route('/', methods = ["POST", "GET"])
 def connexion():
+    db = get_db()
+    cur = db.cursor()
     if request.method== "POST":
         return render_template("accueil.html")
     return render_template("pageconnexion.html")
@@ -43,12 +45,16 @@ def enfant():
 
 @app.route('/facture')
 def facture():
-    mois=["janvier","février","mars","avril","mai","juin","juillet","aout","septembre","octobre","novembre","décembre"];
+    mois=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
     return render_template("facture.html", mois=mois)
 
 @app.route('/actu')
 def actu():
     return render_template("actualites.html")
+
+@app.route('/info')
+def info():
+    return render_template("info.html")
 
 @app.route('/deconnexion')
 def deconnexion():

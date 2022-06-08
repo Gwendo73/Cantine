@@ -53,8 +53,10 @@
         </nav>
 
 {% for i in mois %}
-<div class="col-6 mx-auto mt-3">
-<button type="button" class="btn btn-warning btn-sm" title="Télécharger ma facture de i (nouvelle fenêtre - fichier PDF d'environ 250Ko)"> Télécharger ma facture de {{i}}</button>
+<div class="text-center col-md-6 mt-3">
+<button type="button" class="btn btn-warning btn-sm" title="Télécharger ma facture de i (nouvelle fenêtre - fichier PDF d'environ 250Ko)">{{i}} <img width=25 height=25 src="/static/img/download_icon.png"></button>
+</div>
+        </div>
 </div>
 {% endfor %}
 
