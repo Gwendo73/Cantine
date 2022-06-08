@@ -63,11 +63,14 @@ def inscription():
     if request.method== "POST":
         db = get_db()
         cur = db.cursor()
+        user = cur.execute("SELECT identifiant FROM Compte WHERE identifiant=?", (request.form["mail"], )).fetchone()
+        if user:
+            return render_template("inscription.html", invalid = True)
         password = bcrypt.generate_password_hash(request.form["password"])
         cur.execute("INSERT INTO Compte(identifiant, mot_de_passe, type_compte) VALUES (?,?,?)",
             (request.form["mail"], password, "Representant"))
         cur.execute("INSERT INTO Representant(nom_representant, prenom_representant, telephone, email) VALUES (?,?,?,?)",
-            (request.form["name"], request.form["prenom"], request.form["tel"], request.form["mail"]))
+            (request.form["name"], request.form["prenom"], request.form["phone"], request.form["mail"]))
         db.commit()
         return redirect("/")
     return render_template("inscription.html")
