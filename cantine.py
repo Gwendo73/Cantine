@@ -4,6 +4,7 @@ import flask_login
 from flask_bcrypt import Bcrypt
 import sqlite3
 
+# INITIALISATION
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
@@ -11,6 +12,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 app.config['SECRET_KEY'] = 'clesecrete'
 
+# CONNEXION/DECONNEXION
 @login_manager.user_loader
 def load_user(user_id):
     db = get_db()
@@ -29,6 +31,42 @@ class User(UserMixin):
     def id(self):
         return self.name
 
+@app.route('/', methods = ["POST", "GET"])
+def connexion():
+    if request.method == "POST":
+        db = get_db()
+        cur = db.cursor()
+        user = cur.execute("SELECT * FROM Compte WHERE identifiant=?", (request.form["identifiant"], )).fetchone()
+        if user:
+            new_user = User(user[0], user[1])
+            try:
+                new_user.password = user[1]
+            except Exception:
+                error = 'Invalid Username or Password'
+                return render_template('connexion.html', error=error)
+
+            if bcrypt.check_password_hash(new_user.password, request.form["password"]):
+                login_user(new_user)
+                if user[2] == 'Admin':
+                    return redirect('accueilAdmin')
+                return redirect('accueil')
+
+            else:
+                error = 'Invalid Username or Password'
+                return render_template('connexion.html', error=error)
+        else:
+            error = 'Invalid Username or Password'
+            return render_template('connexion.html', error=error)
+    return render_template('connexion.html')
+
+@app.route('/deconnexion', methods=['GET', 'POST'])
+@login_required
+def deconnexion():
+    logout_user()
+    return redirect("/")
+
+# BASE DE DONNEES
+
 DATABASE = "db/cantine.db"
 
 def get_db():
@@ -42,32 +80,7 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-@app.route('/', methods = ["POST", "GET"])
-def connexion():
-    if request.method == "POST":
-        db = get_db()
-        cur = db.cursor()
-        user = cur.execute("SELECT identifiant, mot_de_passe FROM Compte WHERE identifiant=?", (request.form["mail"],)).fetchone()
-        if user:
-            new_user = User(user[0], user[1])
-            try:
-                new_user.password = user[1]
-            except Exception:
-                error = 'Invalid Username or Password'
-                return render_template('connexion.html', error=error)
-
-            if bcrypt.check_password_hash(new_user.password, request.form["password"]):
-                login_user(new_user)
-                return redirect('accueil')
-
-            else:
-                error = 'Invalid Username or Password'
-                return render_template('connexion.html', error=error)
-        else:
-            error = 'Invalid Username or Password'
-            return render_template('connexion.html', error=error)
-    return render_template('connexion.html')
-
+# REPRESENTANT
 
 @app.route('/inscription', methods = ["POST", "GET"])
 def inscription():
@@ -121,12 +134,6 @@ def actu():
 def info():
     return render_template("info.html")
 
-@app.route('/deconnexion', methods=['GET', 'POST'])
-@login_required
-def deconnexion():
-    logout_user()
-    return redirect("/")
-
 @app.route('/accueil')
 @login_required
 def accueil():
@@ -134,6 +141,12 @@ def accueil():
     cur = db.cursor()
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
     return render_template("accueil.html", enfants = enfants)
+
+# ADMINISTRATEUR
+@app.route('/accueilAdmin', methods=['GET', 'POST'])
+@login_required
+def accueilAdmin():
+    return render_template('accueilAdmin.html')
 
 @app.route('/ajouterEnfant', methods=['GET', 'POST'])
 @login_required
@@ -146,3 +159,8 @@ def ajouterEnfant():
         db.commit()
         return redirect('/accueil')
     return render_template('ajouterEnfant.html')
+
+
+@app.route('/infosfamille')
+def infosfamille():
+    return render_template('infosfamille.html')
