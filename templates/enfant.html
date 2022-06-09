@@ -37,7 +37,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             {% for enfant in enfants %}
-            <li><a class="dropdown-item" href="/enfant">{{enfant[0]}}</a></li>
+            <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{enfant[1]}}</a></li>
             {% endfor %}
           </ul>
         </li>
@@ -63,27 +63,27 @@
   <div class="container mt-5 mb-5">
     <form method="POST">
       <div class="row mb-3">
-        <label for="inputNom3" class="col-sm-2 col-form-label">Prénom</label>
+        <label for="surname" class="col-sm-2 col-form-label">Nom</label>
         <div class="col-sm-10">
-          <input type="name" class="form-control" id="inputNom3">
+          <input name="surname" type="name" class="form-control" id="surname" value="{{ enfant[1] }}">
         </div>
       </div>
       <div class="row mb-3">
-        <label for="inputPrenom3" class="col-sm-2 col-form-label">Nom</label>
+        <label for="name" class="col-sm-2 col-form-label">Prénom</label>
         <div class="col-sm-10">
-          <input type="name" class="form-control" id="inputPrenom3">
+          <input name="name" type="name" class="form-control" id="name" value="{{ enfant[2] }}">
         </div>
       </div>
       <div class="form-group">
-        <label for="exampleFormControlSelect1">Ecole</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="school">Ecole</label>
+        <select name="school" class="form-control" id="school">
           <option>Maternelle</option>
           <option>Primaire</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="exampleFormControlSelect1">Classe</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="class">Classe</label>
+        <select name="class" class="form-control" id="class">
           <option>Petite section</option>
           <option>Moyenne Section</option>
           <option>Grande Section</option>
@@ -94,66 +94,66 @@
           <option>CM2</option>
         </select>
       </div>
-      <div class="form-group row">
-        <div class="col-sm-2">Allergies</div>
-        <div class="col-sm-10">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Gluten
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Arachides
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Fruits de mer
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Lactose
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              L'oeuf
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Fruits
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="gridCheck">
-            <label class="form-check-label" for="gridCheck">
-              Gluten
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="exampleFormControlSelect1">Régime</label>
-        <select class="form-control" id="exampleFormControlSelect1">
-          <option>J1</option>
-          <option>J2</option>
-          <option>Grande Section</option>
-          <option>CP</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="exampleFormControlFile1">Justificatif</label>
-        <input type="file" class="form-control-file" id="exampleFormControlFile1">
-      </div>
+      <!-- <div class="form-group row">
+                      <div class="col-sm-2">Allergies</div>
+                      <div class="col-sm-10">
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  Gluten
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  Arachides
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  Fruits de mer
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  Lactose
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  L'oeuf
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  Fruits
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gridCheck">
+                              <label class="form-check-label" for="gridCheck">
+                                  Gluten
+                              </label>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <label for="exampleFormControlSelect1">Régime</label>
+                      <select class="form-control" id="exampleFormControlSelect1">
+                          <option>J1</option>
+                          <option>J2</option>
+                          <option>Grande Section</option>
+                          <option>CP</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label for="exampleFormControlFile1">Justificatif</label>
+                      <input type="file" class="form-control-file" id="exampleFormControlFile1">
+                  </div> -->
       <button type="submit" class="btn btn-warning mb-3">Soumettre</button>
     </form>
   </div>

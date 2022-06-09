@@ -34,6 +34,9 @@
       <button type="submit" class="btn btn-warning">Se connecter</button>
       <a class="btn btn-warning" href="/inscription">Inscription</a>
     </form>
+    {% if error %}
+      <p>{{ error }}</p>
+    {% endif %}
   </div>
 </body>
 

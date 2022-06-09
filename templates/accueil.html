@@ -36,8 +36,9 @@
             FAMILLE
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <li><a href="/ajouterEnfant" class="dropdown-item">Ajouter un enfant</a></li>
             {% for enfant in enfants %}
-              <li><a class="dropdown-item" href="/enfant">{{enfant[0]}}</a></li>
+              <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{enfant[1]}}</a></li>
             {% endfor %}
           </ul>
         </li>

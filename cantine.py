@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request,g
+from flask import Flask, redirect, render_template, request, g, url_for
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 import flask_login
 from flask_bcrypt import Bcrypt
@@ -42,20 +42,31 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-#FENETRE
-
 @app.route('/', methods = ["POST", "GET"])
 def connexion():
     if request.method == "POST":
         db = get_db()
         cur = db.cursor()
         user = cur.execute("SELECT identifiant, mot_de_passe FROM Compte WHERE identifiant=?", (request.form["mail"],)).fetchone()
-        new_user = User(user[0], user[1])
-        if new_user:
+        if user:
+            new_user = User(user[0], user[1])
+            try:
+                new_user.password = user[1]
+            except Exception:
+                error = 'Invalid Username or Password'
+                return render_template('connexion.html', error=error)
+
             if bcrypt.check_password_hash(new_user.password, request.form["password"]):
                 login_user(new_user)
-                return redirect("accueil")
-    return render_template("connexion.html")
+                return redirect('accueil')
+
+            else:
+                error = 'Invalid Username or Password'
+                return render_template('connexion.html', error=error)
+        else:
+            error = 'Invalid Username or Password'
+            return render_template('connexion.html', error=error)
+    return render_template('connexion.html')
 
 
 @app.route('/inscription', methods = ["POST", "GET"])
@@ -65,7 +76,8 @@ def inscription():
         cur = db.cursor()
         user = cur.execute("SELECT identifiant FROM Compte WHERE identifiant=?", (request.form["mail"], )).fetchone()
         if user:
-            return render_template("inscription.html", invalid = True)
+            error = 'Username already existing'
+            return render_template("inscription.html", error = error)
         password = bcrypt.generate_password_hash(request.form["password"])
         cur.execute("INSERT INTO Compte(identifiant, mot_de_passe, type_compte) VALUES (?,?,?)",
             (request.form["mail"], password, "Representant"))
@@ -75,13 +87,20 @@ def inscription():
         return redirect("/")
     return render_template("inscription.html")
 
-@app.route('/enfant')
+@app.route('/enfant/<int:code_enfant>', methods = ["POST", "GET"])
 @login_required
-def enfant():
+def enfant(code_enfant):
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT prenom_enfant from enfant WHERE code_representant=1").fetchall()
-    return render_template("enfant.html", enfants=enfants)
+    if request.method == "POST":
+        cur.execute("UPDATE Enfant SET nom_enfant=?, prenom_enfant=? WHERE code_enfant=?", (request.form["surname"], request.form["name"], code_enfant,))
+        db.commit()
+        return redirect(url_for('accueil'))
+
+    representant = cur.execute("SELECT code_representant FROM Representant WHERE email=?", (flask_login.current_user.name,)).fetchone()
+    enfant = cur.execute("SELECT * from enfant WHERE code_representant=? and code_enfant=?", (representant[0], code_enfant,)).fetchone()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
+    return render_template("enfant.html", enfants=enfants, enfant=enfant)
 
 @app.route('/facture')
 @login_required
@@ -94,7 +113,7 @@ def facture():
 def actu():
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT prenom_enfant from enfant WHERE code_representant=1").fetchall()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
     return render_template("actualites.html", enfants = enfants)
 
 @app.route('/info')
@@ -113,6 +132,17 @@ def deconnexion():
 def accueil():
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
     return render_template("accueil.html", enfants = enfants)
 
+@app.route('/ajouterEnfant', methods=['GET', 'POST'])
+@login_required
+def ajouterEnfant():
+    if request.method== "POST":
+        db = get_db()
+        cur = db.cursor()
+        representant = cur.execute("SELECT code_representant FROM Representant WHERE email=?", (flask_login.current_user.name,)).fetchone()
+        cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant) VALUES (?,?,1,1,?)", (request.form["surname"], request.form["name"], representant[0]))
+        db.commit()
+        return redirect('/accueil')
+    return render_template('ajouterEnfant.html')
