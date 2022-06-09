@@ -146,7 +146,12 @@ def accueil():
 @app.route('/accueilAdmin', methods=['GET', 'POST'])
 @login_required
 def accueilAdmin():
-    return render_template('accueilAdmin.html')
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant=?", (flask_login.current_user.name,)).fetchone()
+    if user[0] == 'Admin':
+        return render_template('accueilAdmin.html')
+    return redirect('accueil')
 
 @app.route('/ajouterEnfant', methods=['GET', 'POST'])
 @login_required
