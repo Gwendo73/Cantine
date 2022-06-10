@@ -22,7 +22,7 @@
             <ul class="navbar-nav">
 
                 <li class="nav-item float-right">
-                    <a class="nav-link" btn-outline-success href="/acceuilAdmin">Accueil</a>
+                    <a class="nav-link" btn-outline-success href="/accueilAdmin">Accueil</a>
                 </li>
                 <li class="nav-item float-right">
                     <a class="nav-link" btn-outline-success href="/infospersonnel">Informations Personnels</a>
@@ -41,15 +41,15 @@
         <form method="POST">
 
             <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label">Nom du responsable légal</label>
+                <label for="surname" class="col-sm-2 col-form-label">Nom du responsable légal</label>
                 <div class="col-sm-10">
-                    <input name="name" type="name" class="form-control" id="name" value="{{representant[1]}}" required>
+                    <input name="surname" type="name" class="form-control" id="surname" value="{{representant[1]}}" required>
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
+                <label for="name" class="col-sm-2 col-form-label">Prénom</label>
                 <div class="col-sm-10">
-                    <input name="prenom" type="name" class="form-control" id="prenom" value="{{representant[2]}}"
+                    <input name="name" type="name" class="form-control" id="name" value="{{representant[2]}}"
                         required>
                 </div>
             </div>
@@ -60,19 +60,20 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
-                <div class="col-sm-10">
-                    <input name="password" type="password" class="form-control" id="password"
-                        value="{{representant[4]}}" required>
-                </div>
-            </div>
-            <div class="row mb-3">
                 <label for="phone" class="col-sm-2 col-form-label">Telephone</label>
                 <div class="col-sm-10">
                     <input name="phone" type="number" class="form-control" id="phone" value="{{representant[3]}}"
                         required>
                 </div>
             </div>
+            <div class="row mb-3">
+                <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
+                <div class="col-sm-10">
+                    <input name="password" type="password" class="form-control" id="password"
+                        value="{{representant[5]}}" required>
+                </div>
+            </div>
+            <input type="hidden" id="id" name="id" value="{{representant[6]}}">
             <button type="submit" class="btn btn-warning">Modifier</button>
 
         </form>
@@ -103,9 +104,6 @@
 
         </table>
     </div>
-
-
-    <p>BIENVENUE ADMIN</p>
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"

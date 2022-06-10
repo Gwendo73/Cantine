@@ -91,13 +91,15 @@ def inscription():
         if user:
             error = 'Cet utilisateur possède déjà un compte'
             return render_template("inscription.html", error = error)
-        password = bcrypt.generate_password_hash(request.form["password"])
-        cur.execute("INSERT INTO Compte(identifiant, mot_de_passe, type_compte) VALUES (?,?,?)",
-            (request.form["mail"], password, "Representant"))
-        cur.execute("INSERT INTO Representant(nom_representant, prenom_representant, telephone, email) VALUES (?,?,?,?)",
-            (request.form["name"], request.form["prenom"], request.form["phone"], request.form["mail"]))
-        db.commit()
-        return redirect("/")
+        if request.form["password"] == request.form["password2"]:
+            password = bcrypt.generate_password_hash(request.form["password"])
+            cur.execute("INSERT INTO Compte(identifiant, mot_de_passe, type_compte) VALUES (?,?,?)",
+                (request.form["id"], password, "Representant"))
+            cur.execute("INSERT INTO Representant(nom_representant, prenom_representant, telephone, email, identifiant) VALUES (?,?,?,?,?)",
+                (request.form["name"], request.form["prenom"], request.form["phone"], request.form["mail"], request.form["id"]))
+            db.commit()
+            return redirect("/")
+        return render_template("inscription.html", error = "Les mots de passes sont différents")
     return render_template("inscription.html")
 
 @app.route('/enfant/<int:code_enfant>', methods = ["POST", "GET"])
@@ -110,9 +112,9 @@ def enfant(code_enfant):
         db.commit()
         return redirect(url_for('accueil'))
 
-    representant = cur.execute("SELECT code_representant FROM Representant WHERE email=?", (flask_login.current_user.name,)).fetchone()
+    representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant=?", (flask_login.current_user.name,)).fetchone()
     enfant = cur.execute("SELECT * from enfant WHERE code_representant=? and code_enfant=?", (representant[0], code_enfant,)).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
     return render_template("enfant.html", enfants=enfants, enfant=enfant)
 
 @app.route('/facture')
@@ -126,7 +128,7 @@ def facture():
 def actu():
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
     return render_template("actualites.html", enfants = enfants)
 
 @app.route('/info')
@@ -134,7 +136,7 @@ def actu():
 def info():
     db = get_db()
     cur = db.cursor()
-    info = cur.execute("SELECT * FROM Representant WHERE email=?",(flask_login.current_user.name, )).fetchone()
+    info = cur.execute("SELECT * FROM Representant WHERE identifiant=?",(flask_login.current_user.name, )).fetchone()
     compte = cur.execute("SELECT * from Compte WHERE identifiant=?", (flask_login.current_user.name, )).fetchone()
     return render_template("info.html", info = info, compte = compte)
 
@@ -143,7 +145,7 @@ def info():
 def info2():
     db = get_db()
     cur = db.cursor()
-    info = cur.execute("SELECT * FROM Representant WHERE email=?",(flask_login.current_user.name, )).fetchone()
+    info = cur.execute("SELECT * FROM Representant WHERE identifiant=?",(flask_login.current_user.name, )).fetchone()
     if request.method== "POST": 
         user = cur.execute("SELECT * FROM Compte WHERE identifiant=?", (flask_login.current_user.name, )).fetchone()
         if user:
@@ -171,7 +173,7 @@ def info2():
 def accueil():
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.email=?", (flask_login.current_user.name, )).fetchall()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
     return render_template("accueil.html", enfants = enfants)
 
 # ADMINISTRATEUR
@@ -191,39 +193,55 @@ def ajouterEnfant():
     if request.method== "POST":
         db = get_db()
         cur = db.cursor()
-        representant = cur.execute("SELECT code_representant FROM Representant WHERE email=?", (flask_login.current_user.name,)).fetchone()
+        representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant=?", (flask_login.current_user.name,)).fetchone()
         cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant) VALUES (?,?,1,1,?)", (request.form["surname"], request.form["name"], representant[0]))
         db.commit()
         return redirect('/accueil')
     return render_template('ajouterEnfant.html')
 
 
-@app.route('/infosfamille')
-def infosfamille():
-    #CESAR
+@app.route('/infosFamilles')
+def infosFamille():
     db = get_db()
     cur = db.cursor()
     representants = cur.execute("SELECT * FROM representant").fetchall()
-    return render_template('infosfamille.html', representants=representants)
+    return render_template('infosFamilles.html', representants=representants)
 
-@app.route('/comptes')
+@app.route('/comptes', methods = ["POST", "GET"])
 def comptes():
+    if request.method == "POST":
+        db = get_db()
+        cur = db.cursor()
+        user = cur.execute("SELECT identifiant FROM Compte WHERE identifiant=?", (request.form["id"], )).fetchone()
+        if user:
+            error = 'Cet utilisateur possède déjà un compte'
+            return render_template("comptes.html", error = error)
+        if (request.form["password"] == request.form["password2"]):
+            password = bcrypt.generate_password_hash(request.form["password"])
+            cur.execute("INSERT INTO Compte VALUES (?,?,?)", (request.form["id"], password, request.form["type"]))
+            if request.form["type"] == "Representant":
+                cur.execute("INSERT INTO Representant(nom_representant, prenom_representant, identifiant) VALUES (?,?,?)", (request.form["surname"], request.form["name"], request.form["id"],))
+            else:
+                cur.execute("INSERT INTO Enseignant(nom_enseignant, prenom_enseignant, identifiant) VALUES (?,?,?)", (request.form["surname"], request.form["name"], request.form["id"],))
+            db.commit()
+            return render_template("comptes.html", msg = 'Compte créé avec succès')
+        return render_template("comptes.html", error = 'Les mots de passe ne correspondent pas')
     return render_template("comptes.html")
 
-@app.route('/detailsFamilles/<int:code_rep>', methods = ["POST", "GET"])
+@app.route('/detailsFamille/<int:code_rep>', methods = ["POST", "GET"])
 def editFamille(code_rep):
     db = get_db()
     cur = db.cursor()
-    # if request.method == "POST":
-    #     cur.execute("UPDATE fpl SET cruiseSpeed=?, aircraftType=?, departureId=?, arrivalId=? "
-    #         "WHERE id = ?",
-    #         (request.form["cruiseSpeed"], request.form["aircraftType"], request.form["departureId"], request.form["arrivalId"], code_rep))
-    #     db.commit()
-    #     return redirect("/")
+    if request.method == "POST":
+        password = bcrypt.generate_password_hash(request.form["password"])
+        cur.execute("UPDATE Compte SET identifiant = ?, mot_de_passe = ? WHERE identifiant = ?", request.form["mail"], password, request.form["mail"])
+        cur.execute("UPDATE Representant SET nom_representant=?, prenom_representant=?, telephone=?, email=? WHERE code_representant = ?", (request.form["surname"], request.form["name"], request.form["phone"], request.form["mail"], code_rep))
+        db.commit()
+        return redirect("/detailsFamille")
     
-    representant = cur.execute("SELECT * FROM representant WHERE code_representant = ?", (code_rep,)).fetchone()
+    representant = cur.execute("SELECT R.*, C.mot_de_passe FROM Representant AS R INNER JOIN Compte AS C ON R.email = C.identifiant WHERE R.code_representant = ?", (code_rep,)).fetchone()
     enfants = cur.execute("SELECT * FROM enfant WHERE code_representant = ?" ,  (code_rep,) ).fetchall()
-    return render_template("detailsFamilles.html", representant = representant, enfants = enfants)
+    return render_template("detailsFamille.html", representant = representant, enfants = enfants)
 
 @app.route('/detailsEnfants/<int:code_enf>', methods = ["POST", "GET"])
 def editEnfant(code_enf):
@@ -238,3 +256,5 @@ def editEnfant(code_enf):
     
     enfant = cur.execute("SELECT * FROM enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
     return render_template("detailsEnfants.html", enfant = enfant)
+
+
