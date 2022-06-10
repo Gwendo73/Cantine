@@ -49,36 +49,38 @@
             <div class="row mb-3">
                 <label for="name" class="col-sm-2 col-form-label">Prénom</label>
                 <div class="col-sm-10">
-                    <input name="name" type="name" class="form-control" id="name" value="{{representant[2]}}"
-                        required>
+                    <input name="name" type="name" class="form-control" id="name" value="{{representant[2]}}" required>
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="mail" class="col-sm-2 col-form-label">Email</label>
                 <div class="col-sm-10">
-                    <input name="mail" type="email" class="form-control" id="mail" value="{{representant[4]}}" required>
+                    <input name="mail" type="email" class="form-control" id="mail" value="{{representant[4]}}">
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="phone" class="col-sm-2 col-form-label">Telephone</label>
                 <div class="col-sm-10">
-                    <input name="phone" type="number" class="form-control" id="phone" value="{{representant[3]}}"
-                        required>
+                    <input name="phone" type="number" class="form-control" id="phone" value="{{representant[3]}}">
                 </div>
             </div>
             <div class="row mb-3">
                 <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
                 <div class="col-sm-10">
                     <input name="password" type="password" class="form-control" id="password"
-                        value="{{representant[5]}}" required>
+                        value="{{representant[6]}}" required>
                 </div>
             </div>
-            <input type="hidden" id="id" name="id" value="{{representant[6]}}">
+            <input type="hidden" id="id" name="id" value="{{representant[5]}}">
             <button type="submit" class="btn btn-warning">Modifier</button>
+            <a href="/ajouterEnfant/{{ representant[0] }}" class="btn btn-warning">Creer un enfant</a>
+            <a href="/suppressionR/{{ representant[0] }}" class="btn btn-warning" onclick="return confirm('Voulez-vous vraiment supprimer ce compte ?')">Supprimer le Compte</a>
+            <a href="/infosFamilles" class="btn btn-warning">Retour</a>
+            
 
         </form>
     </div>
-
+    {% if enfants%}
     <div class="container">
         <table class="table table-striped">
             <thead>
@@ -94,7 +96,7 @@
                 <tr>
                     <td>{{ enfant[1] }}</td>
                     <td>{{ enfant[2] }}</td>
-                    <td>{{ enfant[4] }}</td>
+                    <td>{{ enfant[6] }}</td>
                     <td>
                         <a href="/detailsEnfants/{{ enfant[0] }}" class="btn btn-warning">Editer</a>
                     </td>
@@ -104,6 +106,7 @@
 
         </table>
     </div>
+    {%endif%}
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"

@@ -189,27 +189,36 @@ def accueilAdmin():
         return render_template('accueilAdmin.html')
     return redirect('accueil')
 
-@app.route('/ajouterEnfant', methods=['GET', 'POST'])
+@app.route('/ajouterEnfant/<int:code_rep>', methods=['GET', 'POST'])
 @login_required
-def ajouterEnfant():
-    if request.method== "POST":
+def ajouterEnfant(code_rep):
+    db = get_db()
+    cur = db.cursor()
+    representant = cur.execute("SELECT nom_representant, prenom_representant, code_representant FROM Representant WHERE code_representant = ?", (code_rep, )).fetchone()
+    tarifs = cur.execute("SELECT * FROM Tarif").fetchall()
+    classes = cur.execute("SELECT * FROM Classe").fetchall()
+    if request.method == "POST":
         db = get_db()
         cur = db.cursor()
-        representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant=?", (flask_login.current_user.name,)).fetchone()
-        cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant) VALUES (?,?,1,1,?)", (request.form["surname"], request.form["name"], representant[0]))
+        cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant) VALUES (?,?,?,?,?)", (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], request.form["code"]))
         db.commit()
-        return redirect('/accueil')
-    return render_template('ajouterEnfant.html')
+        return redirect(url_for('detailsFamille', code_rep = request.form["code"]))
+    return render_template('ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs)
 
 
 @app.route('/infosFamilles')
+@login_required
 def infosFamille():
     db = get_db()
     cur = db.cursor()
-    representants = cur.execute("SELECT * FROM representant").fetchall()
-    return render_template('infosFamilles.html', representants=representants)
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant=?", (flask_login.current_user.name,)).fetchone()
+    if user[0] == 'Admin':
+        representants = cur.execute("SELECT * FROM representant").fetchall()
+        return render_template('infosFamilles.html', representants=representants)
+    return redirect('acceuil')
 
 @app.route('/comptes', methods = ["POST", "GET"])
+@login_required
 def comptes():
     if request.method == "POST":
         db = get_db()
@@ -231,32 +240,54 @@ def comptes():
     return render_template("comptes.html")
 
 @app.route('/detailsFamille/<int:code_rep>', methods = ["POST", "GET"])
-def editFamille(code_rep):
+@login_required
+def detailsFamille(code_rep):
     db = get_db()
     cur = db.cursor()
     if request.method == "POST":
         password = bcrypt.generate_password_hash(request.form["password"])
-        cur.execute("UPDATE Compte SET identifiant = ?, mot_de_passe = ? WHERE identifiant = ?", request.form["mail"], password, request.form["mail"])
+        cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, request.form["id"],))
         cur.execute("UPDATE Representant SET nom_representant=?, prenom_representant=?, telephone=?, email=? WHERE code_representant = ?", (request.form["surname"], request.form["name"], request.form["phone"], request.form["mail"], code_rep))
         db.commit()
-        return redirect("/detailsFamille")
-    
-    representant = cur.execute("SELECT R.*, C.mot_de_passe FROM Representant AS R INNER JOIN Compte AS C ON R.email = C.identifiant WHERE R.code_representant = ?", (code_rep,)).fetchone()
-    enfants = cur.execute("SELECT * FROM enfant WHERE code_representant = ?" ,  (code_rep,) ).fetchall()
+
+    representant = cur.execute("SELECT R.*, C.mot_de_passe FROM Representant AS R INNER JOIN Compte AS C ON R.identifiant = C.identifiant WHERE R.code_representant = ?", (code_rep,)).fetchone()
+    enfants = cur.execute("SELECT E.*, C.nom_classe FROM Enfant AS E INNER JOIN Classe AS C ON E.code_classe = C.code_classe WHERE code_representant = ?" ,  (code_rep,) ).fetchall()
     return render_template("detailsFamille.html", representant = representant, enfants = enfants)
 
 @app.route('/detailsEnfants/<int:code_enf>', methods = ["POST", "GET"])
-def editEnfant(code_enf):
+@login_required
+def detailsEnfants(code_enf):
     db = get_db()
     cur = db.cursor()
-    # if request.method == "POST":
-    #     cur.execute("UPDATE fpl SET cruiseSpeed=?, aircraftType=?, departureId=?, arrivalId=? "
-    #         "WHERE id = ?",
-    #         (request.form["cruiseSpeed"], request.form["aircraftType"], request.form["departureId"], request.form["arrivalId"], code_rep))
-    #     db.commit()
-    #     return redirect("/")
-    
+    if request.method == "POST":
+        cur.execute("UPDATE Enfant SET nom_enfant=?, prenom_enfant=?, code_tarif=?, code_classe=? WHERE code_enfant = ?", (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], request.form["code"],))
+        db.commit()
+        code = cur.execute("SELECT code_representant FROM Enfant WHERE code_enfant = ?", (request.form["code"],)).fetchone()
+        return redirect(url_for('detailsFamille', code_rep = code[0]))
+    tarifs = cur.execute("SELECT * FROM Tarif").fetchall()
+    classes = cur.execute("SELECT * FROM Classe").fetchall()
     enfant = cur.execute("SELECT * FROM enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
-    return render_template("detailsEnfants.html", enfant = enfant)
+    return render_template("detailsEnfants.html", enfant = enfant, tarifs = tarifs, classes = classes)
 
 
+@app.route('/suppressionR/<int:code_rep>', methods = ["POST", "GET"])
+@login_required
+def suppressionR(code_rep):
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT identifiant FROM Representant WHERE code_representant = ?", (code_rep, )).fetchone()
+    cur.execute("DELETE FROM Compte WHERE identifiant = ?", (user[0],))
+    cur.execute("DELETE FROM Representant WHERE code_representant = ?", (code_rep,))
+    cur.execute("DELETE FROM Enfant WHERE code_representant = ?", (code_rep,))
+    db.commit()
+    return redirect(url_for('infosFamilles'))
+
+@app.route('/suppressionE/<int:code_enf>', methods = ["POST", "GET"])
+@login_required
+def suppressionE(code_enf):
+    db = get_db()
+    cur = db.cursor()
+    code = cur.execute("SELECT code_representant FROM Enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
+    cur.execute("DELETE FROM Enfant WHERE code_enfant = ?", (code_enf,))
+    db.commit()
+    return redirect(url_for('detailsFamille', code_rep = code[0]))
