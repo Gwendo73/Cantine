@@ -20,15 +20,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
-
                 <li class="nav-item float-right">
                     <a class="nav-link" btn-outline-success href="/acceuilAdmin">Accueil</a>
                 </li>
                 <li class="nav-item float-right">
-                    <a class="nav-link" btn-outline-success href="/infospersonnel">Informations Personnels</a>
+                    <a class="nav-link" btn-outline-success href="/infosFamilles">Informations Familles</a>
                 </li>
                 <li class="nav-item float-right">
-                    <a class="nav-link" btn-outline-success href="/comptes">Créer un compte</a>
+                    <a class="nav-link" btn-outline-success href="/infosPersonnels">Informations Personnels</a>
                 </li>
                 <li class="nav-item float-right">
                     <a class="nav-link" btn-outline-success href="/deconnexion">Déconnexion</a>
@@ -36,37 +35,20 @@
             </ul>
         </div>
     </nav>
-
-    <div class="container">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nom représentant</th>
-                    <th scope="col">Prénom représentant</th>
-                    <th scope="col">Adresse mail</th>
-                    <th scope="col">Numéro de téléphone</th>
-                    <th scope="col">Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for representant in representants %}
-                <tr>
-                    <td>{{ representant[1] }}</td>
-                    <td>{{ representant[2] }}</td>
-                    <td>{{ representant[4] }}</td>
-                    <td>{{ representant[3] }}</td>
-                    <td>
-                        <a href="/detailsFamilles/{{ representant[0] }}" class="btn btn-warning">Editer</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
-    </div>
-
-
-    <p>BIENVENUE ADMIN</p>
+<div class="container">
+        <div class="row mb-3">
+            <label for="mail" class="col-sm-2 col-form-label">Email</label>
+            <div class="col-sm-10">
+                <input name="mail" type="email" class="form-control" id="mail" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
+            <div class="col-sm-10">
+                <input name="password" type="password" class="form-control" id="password" required>
+            </div>
+        </div>
+</div>
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
@@ -78,7 +60,6 @@
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
         integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
         crossorigin=""></script>
-
 </body>
 
 </html>

@@ -37,26 +37,65 @@
         </div>
     </nav>
 
+    <div class="container mt-3 mb-3">
+        <form method="POST">
+
+            <div class="row mb-3">
+                <label for="name" class="col-sm-2 col-form-label">Nom du responsable légal</label>
+                <div class="col-sm-10">
+                    <input name="name" type="name" class="form-control" id="name" value="{{representant[1]}}" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="prenom" class="col-sm-2 col-form-label">Prénom</label>
+                <div class="col-sm-10">
+                    <input name="prenom" type="name" class="form-control" id="prenom" value="{{representant[2]}}"
+                        required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="mail" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    <input name="mail" type="email" class="form-control" id="mail" value="{{representant[4]}}" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
+                <div class="col-sm-10">
+                    <input name="password" type="password" class="form-control" id="password"
+                        value="{{representant[4]}}" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="phone" class="col-sm-2 col-form-label">Telephone</label>
+                <div class="col-sm-10">
+                    <input name="phone" type="number" class="form-control" id="phone" value="{{representant[3]}}"
+                        required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-warning">Modifier</button>
+
+        </form>
+    </div>
+
     <div class="container">
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col">Nom représentant</th>
-                    <th scope="col">Prénom représentant</th>
-                    <th scope="col">Adresse mail</th>
-                    <th scope="col">Numéro de téléphone</th>
+                    <th scope="col">Nom enfant</th>
+                    <th scope="col">Prénom enfant</th>
+                    <th scope="col">Classe</th>
                     <th scope="col">Details</th>
                 </tr>
             </thead>
             <tbody>
-                {% for representant in representants %}
+                {% for enfant in enfants %}
                 <tr>
-                    <td>{{ representant[1] }}</td>
-                    <td>{{ representant[2] }}</td>
-                    <td>{{ representant[4] }}</td>
-                    <td>{{ representant[3] }}</td>
+                    <td>{{ enfant[1] }}</td>
+                    <td>{{ enfant[2] }}</td>
+                    <td>{{ enfant[4] }}</td>
                     <td>
-                        <a href="/detailsFamilles/{{ representant[0] }}" class="btn btn-warning">Editer</a>
+                        <a href="/detailsEnfants/{{ enfant[0] }}" class="btn btn-warning">Editer</a>
                     </td>
                 </tr>
                 {% endfor %}

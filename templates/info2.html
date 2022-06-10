@@ -60,44 +60,59 @@
     </div>
   </nav>
 
-
-  <form method="POST">
     <div class="container mt-5">
+  <form method="POST">
+
       <div class="mb-3 row">
         <label for="name" class="col-sm-2 col-form-label">Nom</label>
         <div class="col-sm-10">
-          <input class="form-control" type="text" value="{{info[1]}}" aria-label="readonly input example" readonly>
+          <input class="form-control" type="text" value="{{info[1]}}" aria-label="default input example">
         </div>
       </div>
       <div class="mb-3 row">
         <label for="name" class="col-sm-2 col-form-label">Prénom</label>
         <div class="col-sm-10">
-          <input class="form-control" type="text" value="{{info[2]}}" aria-label="readonly input example" readonly>
+          <input name="name" id="password" class="form-control" type="text" value="{{info[2]}}"
+            aria-label="default input example">
         </div>
       </div>
       <div class="mb-3 row">
-        <label for="name" class="col-sm-2 col-form-label">E-mail</label>
+        <label for="e-mail" class="col-sm-2 col-form-label">E-mail</label>
         <div class="col-sm-10">
-          <input class="form-control" type="text" value="{{info[4]}}" aria-label="readonly input example" readonly>
+          <input name="e-mail" id="e-mail" class="form-control" type="text" value="{{info[4]}}"
+            aria-label="default input example">
         </div>
       </div>
       <div class="mb-3 row">
-        <label for="name" class="col-sm-2 col-form-label">Numéro de téléphone</label>
+        <label for="phone" class="col-sm-2 col-form-label">Numéro de téléphone</label>
         <div class="col-sm-10">
-          <input class="form-control" type="text" value="{{info[3]}}" aria-label="readonly input example" readonly>
+          <input name="phone" id="phone" class="form-control" type="text" value="{{info[3]}}"
+            aria-label="default input example">
         </div>
       </div>
       <div class="mb-3 row">
-        <label for="name" class="col-sm-2 col-form-label">Mot de passe</label>
+        <label for="password" class="col-sm-2 col-form-label">Mot de passe</label>
         <div class="col-sm-10">
-          <input class="form-control" type="password" value="{{compte[1]}}" aria-label="readonly input example" readonly>
+          <input name="password" id="password" class="form-control" type="password" value=""
+            aria-label="default input example">
         </div>
       </div>
-      <a href="/info2" class="btn btn-warning">Modifier</a>
-    </div>
+      <div class="mb-3 row">
+        <label for="password2" class="col-sm-2 col-form-label">Confirmation du mot de passe</label>
+        <div class="col-sm-10">
+          <input name="password2" id="password2" class=" form-control" type="password" value=""
+            aria-label="default input example">
+        </div>
+      </div>
+        <button type="submit" class="btn btn-warning">Modifier</button>
+    
 
 
   </form>
+  </div>
+  {% if error %}
+    <p>{{error}}</p>
+  {% endif %}
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"

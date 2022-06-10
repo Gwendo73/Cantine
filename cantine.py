@@ -89,7 +89,7 @@ def inscription():
         cur = db.cursor()
         user = cur.execute("SELECT identifiant FROM Compte WHERE identifiant=?", (request.form["mail"], )).fetchone()
         if user:
-            error = 'Username already existing'
+            error = 'Cet utilisateur possède déjà un compte'
             return render_template("inscription.html", error = error)
         password = bcrypt.generate_password_hash(request.form["password"])
         cur.execute("INSERT INTO Compte(identifiant, mot_de_passe, type_compte) VALUES (?,?,?)",
@@ -132,7 +132,39 @@ def actu():
 @app.route('/info')
 @login_required
 def info():
-    return render_template("info.html")
+    db = get_db()
+    cur = db.cursor()
+    info = cur.execute("SELECT * FROM Representant WHERE email=?",(flask_login.current_user.name, )).fetchone()
+    compte = cur.execute("SELECT * from Compte WHERE identifiant=?", (flask_login.current_user.name, )).fetchone()
+    return render_template("info.html", info = info, compte = compte)
+
+@app.route('/info2', methods = ["GET", "POST"])
+@login_required
+def info2():
+    db = get_db()
+    cur = db.cursor()
+    info = cur.execute("SELECT * FROM Representant WHERE email=?",(flask_login.current_user.name, )).fetchone()
+    if request.method== "POST": 
+        user = cur.execute("SELECT * FROM Compte WHERE identifiant=?", (flask_login.current_user.name, )).fetchone()
+        if user:
+            new_user = User(user[0], user[1])
+
+            if bcrypt.check_password_hash(new_user.password, request.form["password"]):
+                error = "Vous ne pouvez pas réutiliser un ancien mot de passe"
+                return render_template('info2.html', error = error, info = info)
+
+            if request.form["password"] == request.form["password2"]:
+                password = bcrypt.generate_password_hash(request.form["password"])
+                cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, flask_login.current_user.name, ))
+                db.commit()
+                return redirect(url_for('info'))
+
+            error = "Le mot de passe n'est pas le même"
+            return render_template('info2.html', error = error, info = info)
+            
+    return render_template("info2.html", info = info)
+
+   
 
 @app.route('/accueil')
 @login_required
@@ -168,4 +200,41 @@ def ajouterEnfant():
 
 @app.route('/infosfamille')
 def infosfamille():
-    return render_template('infosfamille.html')
+    #CESAR
+    db = get_db()
+    cur = db.cursor()
+    representants = cur.execute("SELECT * FROM representant").fetchall()
+    return render_template('infosfamille.html', representants=representants)
+
+@app.route('/comptes')
+def comptes():
+    return render_template("comptes.html")
+
+@app.route('/detailsFamilles/<int:code_rep>', methods = ["POST", "GET"])
+def editFamille(code_rep):
+    db = get_db()
+    cur = db.cursor()
+    # if request.method == "POST":
+    #     cur.execute("UPDATE fpl SET cruiseSpeed=?, aircraftType=?, departureId=?, arrivalId=? "
+    #         "WHERE id = ?",
+    #         (request.form["cruiseSpeed"], request.form["aircraftType"], request.form["departureId"], request.form["arrivalId"], code_rep))
+    #     db.commit()
+    #     return redirect("/")
+    
+    representant = cur.execute("SELECT * FROM representant WHERE code_representant = ?", (code_rep,)).fetchone()
+    enfants = cur.execute("SELECT * FROM enfant WHERE code_representant = ?" ,  (code_rep,) ).fetchall()
+    return render_template("detailsFamilles.html", representant = representant, enfants = enfants)
+
+@app.route('/detailsEnfants/<int:code_enf>', methods = ["POST", "GET"])
+def editEnfant(code_enf):
+    db = get_db()
+    cur = db.cursor()
+    # if request.method == "POST":
+    #     cur.execute("UPDATE fpl SET cruiseSpeed=?, aircraftType=?, departureId=?, arrivalId=? "
+    #         "WHERE id = ?",
+    #         (request.form["cruiseSpeed"], request.form["aircraftType"], request.form["departureId"], request.form["arrivalId"], code_rep))
+    #     db.commit()
+    #     return redirect("/")
+    
+    enfant = cur.execute("SELECT * FROM enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
+    return render_template("detailsEnfants.html", enfant = enfant)
