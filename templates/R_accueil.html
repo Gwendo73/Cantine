@@ -27,7 +27,8 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <li><a class="dropdown-item" href="/actu">Actualités</a></li>
-            <li><a class="dropdown-item" href="#">Prix</a></li>
+            <li><a class="dropdown-item" href="#">Menu de la semaine</a></li>
+            <li><a class="dropdown-item" href="#">Aide</a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">
@@ -37,7 +38,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             {% for enfant in enfants %}
-              <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{enfant[1]}}</a></li>
+              <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{ enfant[1] }}</a></li>
             {% endfor %}
           </ul>
         </li>
@@ -47,9 +48,9 @@
             MON COMPTE
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="/info">MES INFOS</a></li>
-            <li><a class="dropdown-item" href="/repas">LES REPAS</a></li>
-            <li><a class="dropdown-item" href="/facture">MES FACTURES</a></li>
+            <li><a class="dropdown-item" href="/info">Mes informations</a></li>
+            <li><a class="dropdown-item" href="/facture">Mes factures</a></li>
+            <li><a class="dropdown-item" href="/repas">Mes repas</a></li>
           </ul>
         </li>
         <li class="nav-item">

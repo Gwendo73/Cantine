@@ -19,7 +19,11 @@ DROP TABLE Repas;
 DROP TABLE Representant;
 DROP TABLE Tarif;
 DROP TABLE Enfant;
-
+DROP TABLE Enseignant;
+DROP TABLE Enseigne;
+DROP TABLE Formule;
+DROP TABLE Jour;
+DROP TABLE Mange;
 --
 -- Base de données : `cantine`
 --
@@ -47,6 +51,17 @@ CREATE TABLE IF NOT EXISTS TypeDeClasse (
 );
 
 -- --------------------------------------------------------
+
+--
+-- Structure de la table `Formule`
+--
+
+CREATE TABLE IF NOT EXISTS Formule (
+  code_formule integer primary key autoincrement,
+  nom_formule TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
 --
 -- Structure de la table `Compte`
 --
@@ -56,6 +71,18 @@ CREATE TABLE IF NOT EXISTS Compte (
   mot_de_passe TEXT NOT NULL,
   type_compte TEXT NOT NULL
 );
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `Jour`
+--
+
+CREATE TABLE IF NOT EXISTS Jour (
+  code_jour integer PRIMARY KEY,
+  jour TEXT NOT NULL
+);
+
 
 -- --------------------------------------------------------
 
@@ -70,9 +97,25 @@ CREATE TABLE IF NOT EXISTS Enfant (
   code_tarif integer NOT NULL,
   code_classe integer NOT NULL,
   code_representant integer NOT NULL,
+  code_formule integer NOT NULL,
   FOREIGN KEY (code_tarif) REFERENCES Tarif(code_tarif),
   FOREIGN KEY (code_classe) REFERENCES Classe(code_classe),
   FOREIGN KEY (code_representant) REFERENCES Representant(code_representant)
+  FOREIGN KEY (code_formule) REFERENCES Formule(code_formule)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `Mange`
+--
+
+CREATE TABLE IF NOT EXISTS Mange (
+  code_jour integer,
+  code_enfant integer,
+  PRIMARY KEY(code_jour, code_enfant),
+  FOREIGN KEY (code_jour) REFERENCES Jour(code_jour),
+  FOREIGN KEY (code_enfant) REFERENCES Enfant(code_enfant)
 );
 
 -- --------------------------------------------------------
@@ -116,6 +159,7 @@ CREATE TABLE IF NOT EXISTS Tarif (
   tarif float NOT NULL
 );
 
+
 -- --------------------------------------------------------
 
 --
@@ -141,26 +185,53 @@ CREATE TABLE IF NOT EXISTS Enseigne (
   code_classe integer,
   PRIMARY KEY (code_enseignant, code_classe),
   FOREIGN KEY (code_enseignant) REFERENCES Enseignant(code_enseignant),
-  FOREIGN KEY (code_classe) REFERENCES Enseigne(code_classe)
+  FOREIGN KEY (code_classe) REFERENCES Classe(code_classe)
 );
 
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
 INSERT INTO Compte VALUES ('gartalle', 'test', 'Representant');
-INSERT INTO Compte VALUES ('bdarties', 'test', 'Enseignant');
+INSERT INTO Compte VALUES ('clem', 'test', 'Representant');
+INSERT INTO Compte VALUES ('churson', 'churson', 'Representant');
+INSERT INTO Compte VALUES ('ajacquemin', 'test', 'Enseignant');
 
-INSERT INTO Enseignant VALUES (1, 'DARTIES', 'Benoit', 'bdarties');
+INSERT INTO Enseignant VALUES (1, 'JACQUEMIN', 'Alexis', 'ajacquemin');
+
 INSERT INTO Representant VALUES (1, 'ARTALLE', 'Gwendal', '0647396010', 'gwendal.artalle73@gmail.com', 'gartalle');
 INSERT INTO Representant VALUES (2, 'PHILIPPE', 'Clementine', '0655108310', 'clemclem@gmail.com', 'clem');
+INSERT INTO Representant VALUES (3, 'HURSON', 'Cesar', '', '', 'churson');
 
 INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
+INSERT INTO Tarif VALUES (2, 'Tarif CAF', 2.8);
 
 INSERT INTO TypeDeClasse VALUES (1, 'Primaire');
 INSERT INTO TypeDeClasse VALUES (2, 'Maternelle');
 
 INSERT INTO Classe VALUES (1, 'CP', 1);
+INSERT INTO Classe VALUES (2, 'CE1', 1);
+INSERT INTO Classe VALUES (3, 'CE2', 1);
 
-INSERT INTO Enfant VALUES (1, 'ARTALLE', 'Pierre', 1, 1, 1);
-INSERT INTO Enfant VALUES (2, 'ARTALLE', 'Paul', 1, 1, 1);
-INSERT INTO Enfant VALUES (3, 'ARTALLE', 'Jacques', 1, 1, 1);
+INSERT INTO Formule VALUES (1, '1J');
+INSERT INTO Formule VALUES (2, '2J');
+INSERT INTO Formule VALUES (3, '3J');
+INSERT INTO Formule VALUES (4, '4J');
+INSERT INTO Formule VALUES (5, 'Occasionnel');
+
+INSERT INTO Jour VALUES (1, 'Lundi');
+INSERT INTO Jour VALUES (2, 'Mardi');
+INSERT INTO Jour VALUES (3, 'Mercredi');
+INSERT INTO Jour VALUES (4, 'Jeudi');
+
+INSERT INTO Enfant VALUES (1, 'ARTALLE', 'Pierre', 1, 1, 1, 1);
+INSERT INTO Enfant VALUES (2, 'ARTALLE', 'Paul', 1, 1, 1, 1);
+INSERT INTO Enfant VALUES (3, 'ARTALLE', 'Jacques', 1, 1, 1, 2);
+
+INSERT INTO Mange VALUES (1, 1);
+INSERT INTO Mange VALUES (2, 2);
+INSERT INTO Mange VALUES (3, 3);
+INSERT INTO Mange VALUES (4, 3);
+
+INSERT INTO Enseigne VALUES (1, 1);
 
 INSERT INTO Repas VALUES (1, '2022-06-07', 1);
+
+

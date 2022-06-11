@@ -13,28 +13,36 @@
 <body>
   <img style="width: 100%; height: 150px;"
     src="https://www.logarric.com/wp-content/uploads/2014/06/calendreta-lo-garric3.png" alt="">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
-      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
-
-        <li class="nav-item float-right">
-          <a class="nav-link" btn-outline-success href="/accueilAdmin">Accueil</a>
-        </li>
-        <li class="nav-item float-right">
-          <a class="nav-link" btn-outline-success href="/infospersonnel">Informations Personnels</a>
-        </li>
-        <li class="nav-item float-right">
-          <a class="nav-link" btn-outline-success href="/comptes">Créer un compte</a>
-        </li>
-        <li class="nav-item float-right">
-          <a class="nav-link" btn-outline-success href="/deconnexion">Déconnexion</a>
-        </li>
-      </ul>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+          aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/infosFamilles">Informations Familles</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/infosEnseignants">Informations Enseignants</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/infosClasses">Informations Classes</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/infosTarifs">Informations Tarifs</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/comptes">Créer un compte</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/accueilAdmin">Compte Admin</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/deconnexion">Déconnexion</a>
+              </li>
+          </ul>
+      </div>
   </nav>
 
   <div class="container mt-3">
@@ -57,7 +65,11 @@
         <div class="col-sm-10">
           <select name="classe" class="form-control" id="classe">
             {% for classe in classes %}
-            <option value="{{ classe[0] }}">{{ classe[1] }}</option>
+              {% if enfant[4] == classe[0] %}
+                <option value="{{ classe[0] }}" selected>{{ classe[1] }}</option>
+              {% else %}
+                <option value="{{ classe[0] }}">{{ classe[1] }}</option>
+              {% endif %}
             {% endfor %}
           </select>
         </div>
@@ -67,7 +79,25 @@
         <div class="col-sm-10">
           <select name="tarif" class="form-control" id="tarif">
             {% for tarif in tarifs %}
-            <option value="{{ tarif[0] }}">{{ tarif[1] }}</option>
+              {% if enfant[3] == tarif[0] %}
+                <option value="{{ tarif[0] }}" selected>{{ tarif[1] }} : {{ tarif[2] }}</option>
+              {% else %}
+                <option value="{{ tarif[0] }}">{{ tarif[1] }} : {{ tarif[2] }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="formule" class="col-sm-2  col-form-label">Formule</label>
+        <div class="col-sm-10">
+          <select name="formule" class="form-control" id="formule">
+            {% for formule in formules %}
+              {% if enfant[6] == formule[0] %}
+                <option value="{{ formule[0] }}" selected>{{ formule[1] }}</option>
+              {% else %}
+                <option value="{{ formule[0] }}">{{ formule[1] }}</option>
+              {% endif %}
             {% endfor %}
           </select>
         </div>

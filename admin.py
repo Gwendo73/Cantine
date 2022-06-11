@@ -24,8 +24,8 @@ def ajouterEnfant(code_rep):
         if request.method == "POST":
             db = get_db()
             cur = db.cursor()
-            cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant) VALUES (?,?,?,?,?)", 
-                (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], code_rep, ))
+            cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant, code_formule) VALUES (?,?,?,?,?,?)", 
+                (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], code_rep, request.form["formule"], ))
             db.commit()
             return redirect(url_for('detailsFamille', code_rep = request.form["code"]))
         return render_template('A_ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs)
@@ -82,13 +82,13 @@ def detailsFamille(code_rep):
             db.commit()
 
         representant = cur.execute("SELECT R.*, C.mot_de_passe FROM Representant AS R INNER JOIN Compte AS C ON R.identifiant = C.identifiant WHERE R.code_representant = ?", (code_rep, )).fetchone()
-        enfants = cur.execute("SELECT E.*, C.nom_classe FROM Enfant AS E INNER JOIN Classe AS C ON E.code_classe = C.code_classe WHERE code_representant = ?" ,  (code_rep, )).fetchall()
+        enfants = cur.execute("SELECT C.nom_classe, E.* FROM Enfant AS E INNER JOIN Classe AS C ON E.code_classe = C.code_classe WHERE code_representant = ?" ,  (code_rep, )).fetchall()
         return render_template('A_detailsFamille.html', representant = representant, enfants = enfants)
     return redirect(url_for('acceuil'))
 
-@app.route('/detailsEnfants/<int:code_enf>', methods = ["POST", "GET"])
+@app.route('/detailsEnfant/<int:code_enf>', methods = ["POST", "GET"])
 @login_required
-def detailsEnfants(code_enf):
+def detailsEnfant(code_enf):
     db = get_db()
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
@@ -101,8 +101,9 @@ def detailsEnfants(code_enf):
             return redirect(url_for('detailsFamille', code_rep = code[0]))
         tarifs = cur.execute("SELECT * FROM Tarif").fetchall()
         classes = cur.execute("SELECT * FROM Classe").fetchall()
-        enfant = cur.execute("SELECT * FROM enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
-        return render_template('A_detailsEnfants.html', enfant = enfant, tarifs = tarifs, classes = classes)
+        formules = cur.execute("SELECT * FROM Formule").fetchall()
+        enfant = cur.execute("SELECT * FROM Enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
+        return render_template('A_detailsEnfant.html', enfant = enfant, tarifs = tarifs, formules = formules, classes = classes)
     return redirect(url_for('acceuil'))
 
 
@@ -137,8 +138,58 @@ def suppressionE(code_enf):
 @app.route('/infosEnseignants', methods = ["GET"])
 @login_required
 def infosEnseignants():
-    #Cesar/Alice
-    return render_template('A_infosEnseignants.html')
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        enseignants = cur.execute("SELECT * FROM enseignant").fetchall()
+        return render_template('A_infosEnseignants.html', enseignants=enseignants)
+
+@app.route('/detailsEnseignant/<int:code_ens>', methods = ["POST", "GET"])
+@login_required
+def detailsEnseignant(code_ens):
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        if request.method == "POST":
+            password = bcrypt.generate_password_hash(request.form["password"])
+            cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, request.form["id"], ))
+            cur.execute("UPDATE Enseignant SET nom_enseignant=?, prenom_enseignant = ? WHERE code_enseignant = ?", 
+            (request.form["surname"], request.form["name"], code_ens, ))
+            db.commit()
+
+        enseignant = cur.execute("SELECT Ens.*, C.mot_de_passe FROM Enseignant AS Ens INNER JOIN Compte AS C ON Ens.identifiant = C.identifiant WHERE Ens.code_enseignant = ?", (code_ens, )).fetchone()
+        classes = cur.execute("SELECT C.* FROM Classe AS C INNER JOIN Enseigne AS E ON C.code_classe = E.code_classe WHERE E.code_enseignant = ?" ,  (code_ens, )).fetchall()
+        return render_template('A_detailsEnseignant.html', enseignant = enseignant, classes = classes)
+    return redirect(url_for('acceuil'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/infosTarifs', methods = ["GET"])
 @login_required
@@ -151,3 +202,5 @@ def infosTarifs():
 def infosClasses():
     #Cesar/Alice
     return render_template('A_infosClasses.html')
+
+

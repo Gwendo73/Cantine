@@ -28,15 +28,18 @@ def enfant(code_enfant):
     db = get_db()
     cur = db.cursor()
     if request.method == "POST":
+        cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (request.form["formule"], code_enfant, ))
         cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (request.form["repas"], code_enfant, ))
-        db.commit()
+        print(request.form.getlist('lundi'))
+        #db.commit()
         return redirect(url_for('accueil'))
 
     representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    enfant = cur.execute("SELECT * from enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
+    enfant = cur.execute("SELECT * FROM Enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[0], )).fetchall()
+    formules = cur.execute("SELECT * FROM Formule").fetchall()
     now = datetime.datetime.today().strftime('%Y-%m-%d')
-    return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now)
+    return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now, formules = formules)
 
 @app.route('/facture', methods = ["GET"])
 @login_required
@@ -107,6 +110,6 @@ def repas():
     repas = []
     now = datetime.datetime.today().strftime('%Y-%m-%d')
     for enfant in enfants:
-        repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas > ?", (enfant[0], now, )).fetchall())
+        repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas >= ?", (enfant[0], now, )).fetchall())
 
     return render_template('R_repas.html', enfants = enfants, repas = repas)
