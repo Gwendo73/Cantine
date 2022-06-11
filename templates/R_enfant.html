@@ -89,30 +89,24 @@
             <div class="form-group row">
                 <div class="col-sm-2">Jours</div>
                 <div class="col-sm-10">
+                    {% for jour in jours %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="True" name="lundi" id="lundi">
-                        <label class="form-check-label" for="lundi">
-                            Lundi
+                        {% set br = namespace (break = 1) %}
+                        {% for jourMange in joursManges %}
+                            {% if jour[0] == jourMange[0] %}
+                                <input class="form-check-input" type="checkbox" value="{{ jour[0] }}" name="{{ jour[1] }}" id="{{ jour[1] }}" checked>
+                                {% set br.break = 0 %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if br.break == 1 %}
+                            <input class="form-check-input" type="checkbox" value="{{ jour[0] }}" name="{{ jour[1] }}" id="{{ jour[1] }}">
+                        {% endif %}
+                        
+                        <label class="form-check-label" for="{{ jour[1] }}">
+                            {{ jour[1] }}
                         </label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="True" name="mardi" id="mardi">
-                        <label class="form-check-label" for="mardi">
-                            Mardi
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="True" name="jeudi" id="jeudi">
-                        <label class="form-check-label" for="jeudi">
-                            Jeudi
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="True" name="vendredi" id="vendredi">
-                        <label class="form-check-label" for="vendredi">
-                            Vendredi
-                        </label>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
             <!-- <div class="form-group row">

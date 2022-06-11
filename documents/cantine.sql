@@ -218,8 +218,8 @@ INSERT INTO Formule VALUES (5, 'Occasionnel');
 
 INSERT INTO Jour VALUES (1, 'Lundi');
 INSERT INTO Jour VALUES (2, 'Mardi');
-INSERT INTO Jour VALUES (3, 'Mercredi');
-INSERT INTO Jour VALUES (4, 'Jeudi');
+INSERT INTO Jour VALUES (3, 'Jeudi');
+INSERT INTO Jour VALUES (4, 'Vendredi');
 
 INSERT INTO Enfant VALUES (1, 'ARTALLE', 'Pierre', 1, 1, 1, 1);
 INSERT INTO Enfant VALUES (2, 'ARTALLE', 'Paul', 1, 1, 1, 1);
