@@ -68,15 +68,15 @@ def connexion():
                 login_user(new_user)
                 if user[2] == 'Admin':
                     return redirect(url_for('accueilAdmin'))
-                return redirect(url_for('accueil'))
+                return redirect(url_for('actu'))
 
             else:
                 error = 'Invalid Username or Password'
-                return render_template('connexion.html', error=error)
+                return render_template('G_connexion.html', error=error)
         else:
             error = 'Invalid Username or Password'
-            return render_template('connexion.html', error=error)
-    return render_template('connexion.html')
+            return render_template('G_connexion.html', error=error)
+    return render_template('G_connexion.html')
 
 @app.route('/deconnexion', methods=['GET', 'POST'])
 @login_required

@@ -8,7 +8,7 @@ def accueilAdmin():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
-        return render_template('accueilAdmin.html')
+        return render_template('A_accueilAdmin.html')
     return redirect('accueil')
 
 @app.route('/ajouterEnfant/<int:code_rep>', methods=['GET', 'POST'])
@@ -28,7 +28,7 @@ def ajouterEnfant(code_rep):
                 (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], code_rep, ))
             db.commit()
             return redirect(url_for('detailsFamille', code_rep = request.form["code"]))
-        return render_template('ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs)
+        return render_template('A_ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs)
     return redirect(url_for('acceuil'))
 
 @app.route('/infosFamilles', methods = ["GET"])
@@ -39,7 +39,7 @@ def infosFamille():
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
         representants = cur.execute("SELECT * FROM representant").fetchall()
-        return render_template('infosFamilles.html', representants=representants)
+        return render_template('A_infosFamilles.html', representants=representants)
     return redirect(url_for('acceuil'))
 
 @app.route('/comptes', methods = ["POST", "GET"])
@@ -53,7 +53,7 @@ def comptes():
             user = cur.execute("SELECT identifiant FROM Compte WHERE identifiant = ?", (request.form["id"], )).fetchone()
             if user:
                 error = 'Cet utilisateur possède déjà un compte'
-                return render_template('comptes.html', error = error)
+                return render_template('A_comptes.html', error = error)
             if (request.form["password"] == request.form["password2"]):
                 password = bcrypt.generate_password_hash(request.form["password"])
                 cur.execute("INSERT INTO Compte VALUES (?,?,?)", (request.form["id"], password, request.form["type"], ))
@@ -62,9 +62,9 @@ def comptes():
                 else:
                     cur.execute("INSERT INTO Enseignant(nom_enseignant, prenom_enseignant, identifiant) VALUES (?,?,?)", (request.form["surname"], request.form["name"], request.form["id"], ))
                 db.commit()
-                return render_template('comptes.html', msg = 'Compte créé avec succès')
-            return render_template('comptes.html', error = 'Les mots de passe ne correspondent pas')
-        return render_template('comptes.html')
+                return render_template('A_comptes.html', msg = 'Compte créé avec succès')
+            return render_template('A_comptes.html', error = 'Les mots de passe ne correspondent pas')
+        return render_template('A_comptes.html')
     return redirect(url_for('acceuil'))
 
 @app.route('/detailsFamille/<int:code_rep>', methods = ["POST", "GET"])
@@ -83,7 +83,7 @@ def detailsFamille(code_rep):
 
         representant = cur.execute("SELECT R.*, C.mot_de_passe FROM Representant AS R INNER JOIN Compte AS C ON R.identifiant = C.identifiant WHERE R.code_representant = ?", (code_rep, )).fetchone()
         enfants = cur.execute("SELECT E.*, C.nom_classe FROM Enfant AS E INNER JOIN Classe AS C ON E.code_classe = C.code_classe WHERE code_representant = ?" ,  (code_rep, )).fetchall()
-        return render_template('detailsFamille.html', representant = representant, enfants = enfants)
+        return render_template('A_detailsFamille.html', representant = representant, enfants = enfants)
     return redirect(url_for('acceuil'))
 
 @app.route('/detailsEnfants/<int:code_enf>', methods = ["POST", "GET"])
@@ -102,7 +102,7 @@ def detailsEnfants(code_enf):
         tarifs = cur.execute("SELECT * FROM Tarif").fetchall()
         classes = cur.execute("SELECT * FROM Classe").fetchall()
         enfant = cur.execute("SELECT * FROM enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
-        return render_template('detailsEnfants.html', enfant = enfant, tarifs = tarifs, classes = classes)
+        return render_template('A_detailsEnfants.html', enfant = enfant, tarifs = tarifs, classes = classes)
     return redirect(url_for('acceuil'))
 
 
@@ -138,16 +138,16 @@ def suppressionE(code_enf):
 @login_required
 def infosEnseignants():
     #Cesar/Alice
-    return render_template('infosEnseignants.html')
+    return render_template('A_infosEnseignants.html')
 
 @app.route('/infosTarifs', methods = ["GET"])
 @login_required
 def infosTarifs():
     #Cesar/Alice
-    return render_template('infosTarifs.html')
+    return render_template('A_infosTarifs.html')
 
 @app.route('/infosClasses', methods = ["GET"])
 @login_required
 def infosClasses():
     #Cesar/Alice
-    return render_template('infosClasses.html')
+    return render_template('A_infosClasses.html')

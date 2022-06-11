@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 
+
 <body>
   <img style="width: 100%; height: 150px;"
     src="https://www.logarric.com/wp-content/uploads/2014/06/calendreta-lo-garric3.png" alt="">
@@ -36,7 +37,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             {% for enfant in enfants %}
-              <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{ enfant[1] }}</a></li>
+              <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{enfant[1]}}</a></li>
             {% endfor %}
           </ul>
         </li>
@@ -46,41 +47,23 @@
             MON COMPTE
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="#">MES INFOS</a></li>
+            <li><a class="dropdown-item" href="/info">MES INFOS</a></li>
+            <li><a class="dropdown-item" href="/repas">LES REPAS</a></li>
             <li><a class="dropdown-item" href="/facture">MES FACTURES</a></li>
           </ul>
         </li>
-        <li class="nav-item float-right">
+        <li class="nav-item">
           <a class="nav-link" btn-outline-success href="/deconnexion">Déconnexion</a>
         </li>
-
+        
       </ul>
     </div>
   </nav>
 
-  <figure class="text-center mt-5">
-    <blockquote class="blockquote">
-      <p>Le prix des repas à la cantine scolaire va augmenter d'au moins 5% en moyenne à la rentrée.</p>
-    </blockquote>
-    <figcaption class="blockquote-footer">
-      <cite title="Source Title">La Parisien</cite>
-    </figcaption>
-  </figure>
-  <center>
-    <img width="500" height="500"
-      src="http://www.logarric.com/wp-content/uploads/2022/05/7C431D35-CF5B-4A8B-A5AC-1162BC6F09F9-768x768.jpeg">
-  </center>
-  <figure class="text-center mt-5">
-    <blockquote class="blockquote">
-      <p>La facture des cantines scolaires s'annonce salée pour la prochaine rentrée à cause de l'infaltion. "Si on ne
-        revoit pas le prix de la cantine, il faudra augmenter les impôts"
-      </p>
-    </blockquote>
-    <figcaption class="blockquote-footer">
-      <cite title="Source Title">La Parisien</cite>
-    </figcaption>
-  </figure>
 
+  <form method="POST">
+
+  </form>
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"

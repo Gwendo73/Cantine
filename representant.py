@@ -9,7 +9,7 @@ def inscription():
         user = cur.execute("SELECT identifiant FROM Compte WHERE identifiant = ?", (request.form["mail"], )).fetchone()
         if user:
             error = 'Cet utilisateur possède déjà un compte'
-            return render_template("inscription.html", error = error)
+            return render_template("R_inscription.html", error = error)
         if request.form["password"] == request.form["password2"]:
             password = bcrypt.generate_password_hash(request.form["password"])
             cur.execute("INSERT INTO Compte(identifiant, mot_de_passe, type_compte) VALUES (?,?,?)",
@@ -19,8 +19,8 @@ def inscription():
             db.commit()
             return redirect('/')
         error = 'Les mots de passes sont différents'
-        return render_template('inscription.html', error = error)
-    return render_template('inscription.html')
+        return render_template('R_inscription.html', error = error)
+    return render_template('R_inscription.html')
 
 @app.route('/enfant/<int:code_enfant>', methods = ["POST", "GET"])
 @login_required
@@ -36,13 +36,13 @@ def enfant(code_enfant):
     enfant = cur.execute("SELECT * from enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[0], )).fetchall()
     now = datetime.datetime.today().strftime('%Y-%m-%d')
-    return render_template('enfant.html', enfants = enfants, enfant = enfant, now = now)
+    return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now)
 
 @app.route('/facture', methods = ["GET"])
 @login_required
 def facture():
     mois=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
-    return render_template('facture.html', mois = mois)
+    return render_template('R_facture.html', mois = mois)
 
 @app.route('/actu', methods = ["GET"])
 @login_required
@@ -50,7 +50,7 @@ def actu():
     db = get_db()
     cur = db.cursor()
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
-    return render_template('actualites.html', enfants = enfants)
+    return render_template('R_actualites.html', enfants = enfants)
 
 @app.route('/info', methods = ["GET"])
 @login_required
@@ -59,7 +59,7 @@ def info():
     cur = db.cursor()
     info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
     compte = cur.execute("SELECT * from Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    return render_template('info.html', info = info, compte = compte)
+    return render_template('R_info.html', info = info, compte = compte)
 
 @app.route('/info2', methods = ["GET", "POST"])
 @login_required
@@ -74,7 +74,7 @@ def info2():
 
             if bcrypt.check_password_hash(new_user.password, request.form["password"]):
                 error = 'Vous ne pouvez pas réutiliser un ancien mot de passe'
-                return render_template('info2.html', error = error, info = info)
+                return render_template('R_modifInfo.html', error = error, info = info)
 
             if request.form["password"] == request.form["password2"]:
                 password = bcrypt.generate_password_hash(request.form["password"])
@@ -83,9 +83,9 @@ def info2():
                 return redirect(url_for('info'))
 
             error = "Le mot de passe n'est pas le même"
-            return render_template('info2.html', error = error, info = info)
+            return render_template('R_modifInfo.html', error = error, info = info)
             
-    return render_template('info2.html', info = info)
+    return render_template('R_modifInfo.html', info = info)
 
    
 
@@ -95,7 +95,7 @@ def accueil():
     db = get_db()
     cur = db.cursor()
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    return render_template('accueil.html', enfants = enfants)
+    return render_template('R_accueil.html', enfants = enfants)
 
 @app.route('/repas', methods = ["GET"])
 @login_required
@@ -109,4 +109,4 @@ def repas():
     for enfant in enfants:
         repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas > ?", (enfant[0], now, )).fetchall())
 
-    return render_template('repas.html', enfants = enfants, repas = repas)
+    return render_template('R_repas.html', enfants = enfants, repas = repas)
