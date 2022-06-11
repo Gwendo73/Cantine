@@ -36,7 +36,6 @@
             FAMILLE
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a href="/ajouterEnfant" class="dropdown-item">Ajouter un enfant</a></li>
             {% for enfant in enfants %}
               <li><a class="dropdown-item" href="/enfant/{{ enfant[0] }}">{{enfant[1]}}</a></li>
             {% endfor %}
@@ -49,6 +48,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <li><a class="dropdown-item" href="/info">MES INFOS</a></li>
+            <li><a class="dropdown-item" href="/repas">LES REPAS</a></li>
             <li><a class="dropdown-item" href="/facture">MES FACTURES</a></li>
           </ul>
         </li>

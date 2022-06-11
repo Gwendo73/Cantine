@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS Representant (
 
 CREATE TABLE IF NOT EXISTS Tarif (
   code_tarif integer primary key autoincrement,
+  nom_tarif TEXT NOT NULL,
   tarif float NOT NULL
 );
 
@@ -149,8 +150,9 @@ INSERT INTO Compte VALUES ('bdarties', 'test', 'Enseignant');
 
 INSERT INTO Enseignant VALUES (1, 'DARTIES', 'Benoit', 'bdarties');
 INSERT INTO Representant VALUES (1, 'ARTALLE', 'Gwendal', '0647396010', 'gwendal.artalle73@gmail.com', 'gartalle');
+INSERT INTO Representant VALUES (2, 'PHILIPPE', 'Clementine', '0655108310', 'clemclem@gmail.com', 'clem');
 
-INSERT INTO Tarif VALUES (1, 3.5);
+INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
 
 INSERT INTO TypeDeClasse VALUES (1, 'Primaire');
 INSERT INTO TypeDeClasse VALUES (2, 'Maternelle');
