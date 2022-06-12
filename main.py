@@ -82,7 +82,8 @@ def connexion():
 @login_required
 def deconnexion():
     logout_user()
-    return redirect('/')
+    return render_template('G_deconnexion.html')
 
 import representant
 import admin
+import enseignant
