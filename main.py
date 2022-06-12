@@ -14,13 +14,6 @@ login_manager.login_view = 'login'
 app.config['SECRET_KEY'] = 'clesecrete'
 
 # CONNEXION/DECONNEXION
-@login_manager.user_loader
-def load_user(user_id):
-    db = get_db()
-    cur = db.cursor()
-    user = cur.execute('SELECT identifiant, mot_de_passe FROM Compte WHERE identifiant=?', (user_id, )).fetchone()
-    user = User(user[0], user[1])
-    return user
 
 class User(UserMixin):
 
@@ -31,6 +24,13 @@ class User(UserMixin):
     @property
     def id(self):
         return self.name
+
+@login_manager.user_loader
+def load_user(user_id):
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute('SELECT identifiant, mot_de_passe FROM Compte WHERE identifiant=?', (user_id, )).fetchone()
+    return User(user[0], user[1])
 
 # BASE DE DONNEES
 
@@ -63,7 +63,6 @@ def connexion():
         user = cur.execute("SELECT * FROM Compte WHERE identifiant=?", (request.form["identifiant"], )).fetchone()
         if user:
             new_user = User(user[0], user[1])
-
             if bcrypt.check_password_hash(new_user.password, request.form["password"]):
                 login_user(new_user)
                 if user[2] == 'Admin':
