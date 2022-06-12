@@ -62,8 +62,26 @@ def enfant(code_enfant):
 @app.route('/facture', methods = ["GET"])
 @login_required
 def facture():
+
     mois=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
     return render_template('R_facture.html', mois = mois)
+
+@app.route('/detailsFacture/<int:code_mois>', methods = ["GET"])
+@login_required
+def detailsFacture(code_mois):
+    now = datetime.datetime.today().strftime('%Y-%m-%d')
+    db = get_db()
+    cur = db.cursor()
+    if code_mois < 10:
+        code_mois = '0' + str(code_mois)
+    else:
+        code_mois = str(code_mois)
+    repas = cur.execute("SELECT R.date_repas, E.prenom_enfant, T.tarif FROM Repas AS R INNER JOIN Enfant AS E ON R.code_enfant = E.code_enfant "
+     "INNER JOIN Representant AS Re ON Re.code_representant = E.code_representant INNER JOIN Tarif AS T ON E.code_tarif = T.code_tarif " 
+     "WHERE Re.identifiant = ? AND strftime('%m', date_repas) = ? ORDER BY E.code_enfant, R.date_repas", (flask_login.current_user.name, code_mois, )).fetchall()
+    representant = cur.execute("SELECT nom_representant, prenom_representant, code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[2], )).fetchall()
+    return render_template('R_detailsFacture.html', now = now, repas = repas, representant = representant, enfants = enfants)
 
 @app.route('/actu', methods = ["GET"])
 @login_required
@@ -118,6 +136,25 @@ def accueil():
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
     return render_template('R_accueil.html', enfants = enfants)
 
+@app.route('/ajoutRepas', methods = ["GET", "POST"])
+@login_required
+def ajoutRepas():
+    db = get_db()
+    cur = db.cursor()
+    now = datetime.datetime.today()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+    if request.method == "POST":
+        date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
+        print(date)
+        for enfant in enfants:
+            if request.form.getlist(enfant[1]):
+                check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date, enfant[0])).fetchone()
+                if not check and int(date.strftime('%d')) >= int(now.day) + 2:
+                    cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date.strftime('%Y-%m-%d'), enfant[0]))
+            db.commit()
+        return redirect(url_for('repas'))
+    return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'))
+
 @app.route('/repas', methods = ["GET"])
 @login_required
 def repas():
@@ -126,8 +163,19 @@ def repas():
     code_rep = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     enfants = cur.execute("SELECT * FROM Enfant WHERE code_representant = ?", (code_rep[0], )).fetchall()
     repas = []
-    now = datetime.datetime.today().strftime('%Y-%m-%d')
+    now = datetime.datetime.today()
+    date = now.strftime('%Y-%m-%d')
     for enfant in enfants:
-        repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas >= ?", (enfant[0], now, )).fetchall())
+        repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas >= ? ORDER BY date_repas", (enfant[0], date , )).fetchall())
+    limit = int(now.day) + 2
+    date_limite = now.replace(day = limit)
+    return render_template('R_repas.html', enfants = enfants, repasEnfants = repas, date_limite = date_limite.strftime('%Y-%m-%d'))
 
-    return render_template('R_repas.html', enfants = enfants, repas = repas)
+@app.route('/annuleRepas/<int:code_repas>', methods = ["GET"])
+@login_required
+def annuleRepas(code_repas):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("DELETE FROM Repas WHERE code_repas = ?", (code_repas, ))
+    db.commit()
+    return redirect(url_for('repas'))

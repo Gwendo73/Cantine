@@ -8,7 +8,7 @@
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
-
+</head>
 
 <body>
     <img style="width: 100%; height: 150px;"
@@ -49,76 +49,33 @@
         </nav>
     
 
-    <div class="container mt-3 mb-3">
+
+
+
+
+    <div class="container mt-5 mb-5">
         <form method="POST">
-
             <div class="row mb-3">
-                <label for="id" class="col-sm-2 col-form-label">Identifiant</label>
+                <label for="classe" class="col-sm-2 col-form-label">Nom classe</label>
                 <div class="col-sm-10">
-                    <input name="id" type="text" class="form-control" id="id" value="{{representant[(5)]}}" disabled>
+                    <input name="classe" type="text" class="form-control" id="classe">
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="surname" class="col-sm-2 col-form-label">Nom du responsable légal</label>
+                <label for="type_classe" class="col-sm-2  col-form-label">Classe</label>
                 <div class="col-sm-10">
-                    <input name="surname" type="name" class="form-control" id="surname" value="{{representant[1]}}" required>
+                    <select name="type_classe" class="form-control" id="type_classe">
+                        {% for type_classe in types_classe %}
+                        <option value="{{ type_classe[0] }}">{{ type_classe[2] }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label">Prénom</label>
-                <div class="col-sm-10">
-                    <input name="name" type="name" class="form-control" id="name" value="{{representant[2]}}" required>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="mail" class="col-sm-2 col-form-label">Email</label>
-                <div class="col-sm-10">
-                    <input name="mail" type="email" class="form-control" id="mail" value="{{representant[4]}}">
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="phone" class="col-sm-2 col-form-label">Telephone</label>
-                <div class="col-sm-10">
-                    <input name="phone" type="number" class="form-control" id="phone" value="{{representant[3]}}">
-                </div>
-            </div>
-            <input type="hidden" id="id" name="id" value="{{representant[5]}}">
-            <button type="submit" class="btn btn-warning">Valider les modifications</button>
-            <a href="/ajouterEnfant/{{ representant[0] }}" class="btn btn-warning">Creer un enfant</a>
-            <a href="/suppressionR/{{ representant[0] }}" class="btn btn-warning" onclick="return confirm('Voulez-vous vraiment supprimer ce compte ?')">Supprimer le Compte</a>
-            <a href="/modifMDPR/{{ representant[0] }}" class="btn btn-warning" onclick="return confirm('Voulez-vous vraiment reinitialiser le mot de passe ?')">Réinitialiser le mot de passe</a>
-            <a href="/infosFamilles" class="btn btn-warning">Retour</a>
-            
-
+            <button type="submit" class="btn btn-warning mb-3">Créer</button>
+            <a href="/infosClasses" class="btn btn-warning mb-3">Retour</a>
         </form>
     </div>
-    {% if enfants%}
-    <div class="container">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Nom enfant</th>
-                    <th scope="col">Prénom enfant</th>
-                    <th scope="col">Classe</th>
-                    <th scope="col">Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for enfant in enfants %}
-                <tr>
-                    <td>{{ enfant[0] }}</td>
-                    <td>{{ enfant[1] }}</td>
-                    <td>{{ enfant[2] }}</td>
-                    <td>
-                        <a href="/detailsEnfant/{{ enfant[3] }}" class="btn btn-warning">Editer</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
-    </div>
-    {%endif%}
+    
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
@@ -127,7 +84,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
-
 </body>
 
 </html>

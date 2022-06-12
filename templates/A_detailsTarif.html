@@ -48,77 +48,59 @@
             </div>
         </nav>
     
+    
+    
+    <div class="container mt-3">
+        <h1>{{ tarif[1] }}</h1>
+        <form method="POST" class="mb-3">
+    
+            <div class="row mb-3">
+                <label for="nom_tarif" class="col-sm-2 col-form-label">Nom tarif</label>
+                <div class="col-sm-10">
+                    <input name="nom_tarif" type="name" class="form-control" id="nom_tarif" value="{{tarif[1]}}" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="tarif" class="col-sm-2 col-form-label">Nom tarif</label>
+                <div class="col-sm-10">
+                    <input name="tarif" type="number" step="0.01" class="form-control" id="tarif" value="{{tarif[2]}}" required>
+                </div>
+            </div>
 
-    <div class="container mt-3 mb-3">
-        <form method="POST">
 
-            <div class="row mb-3">
-                <label for="id" class="col-sm-2 col-form-label">Identifiant</label>
-                <div class="col-sm-10">
-                    <input name="id" type="text" class="form-control" id="id" value="{{representant[(5)]}}" disabled>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="surname" class="col-sm-2 col-form-label">Nom du responsable légal</label>
-                <div class="col-sm-10">
-                    <input name="surname" type="name" class="form-control" id="surname" value="{{representant[1]}}" required>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="name" class="col-sm-2 col-form-label">Prénom</label>
-                <div class="col-sm-10">
-                    <input name="name" type="name" class="form-control" id="name" value="{{representant[2]}}" required>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="mail" class="col-sm-2 col-form-label">Email</label>
-                <div class="col-sm-10">
-                    <input name="mail" type="email" class="form-control" id="mail" value="{{representant[4]}}">
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="phone" class="col-sm-2 col-form-label">Telephone</label>
-                <div class="col-sm-10">
-                    <input name="phone" type="number" class="form-control" id="phone" value="{{representant[3]}}">
-                </div>
-            </div>
-            <input type="hidden" id="id" name="id" value="{{representant[5]}}">
             <button type="submit" class="btn btn-warning">Valider les modifications</button>
-            <a href="/ajouterEnfant/{{ representant[0] }}" class="btn btn-warning">Creer un enfant</a>
-            <a href="/suppressionR/{{ representant[0] }}" class="btn btn-warning" onclick="return confirm('Voulez-vous vraiment supprimer ce compte ?')">Supprimer le Compte</a>
-            <a href="/modifMDPR/{{ representant[0] }}" class="btn btn-warning" onclick="return confirm('Voulez-vous vraiment reinitialiser le mot de passe ?')">Réinitialiser le mot de passe</a>
-            <a href="/infosFamilles" class="btn btn-warning">Retour</a>
-            
+            {% if not enfants %}
+            <a href="/suppressionT/{{ tarif[0] }}" class="btn btn-warning"
+                onclick="return confirm('Voulez-vous vraiment supprimer ce tarif ?')">Supprimer le Tarif</a>
+            {% endif %}
+            <a href="/infosTarifs" class="btn btn-warning">Retour</a>
 
-        </form>
-    </div>
-    {% if enfants%}
-    <div class="container">
-        <table class="table table-striped">
+
+        {% if enfants %}
+        <h2>Eleves bénéficiant du tarif</h2>
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th scope="col">Nom enfant</th>
-                    <th scope="col">Prénom enfant</th>
-                    <th scope="col">Classe</th>
+                    <th scope="col">Prenom enfant</th>
                     <th scope="col">Details</th>
                 </tr>
             </thead>
             <tbody>
                 {% for enfant in enfants %}
                 <tr>
-                    <td>{{ enfant[0] }}</td>
                     <td>{{ enfant[1] }}</td>
                     <td>{{ enfant[2] }}</td>
                     <td>
-                        <a href="/detailsEnfant/{{ enfant[3] }}" class="btn btn-warning">Editer</a>
+                        <a href="/detailsEnfant/{{ enfant[0] }}" class="btn btn-warning">Editer</a>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
-
         </table>
+        {% endif %}
     </div>
-    {%endif%}
+    
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
@@ -127,7 +109,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
         integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
         crossorigin="anonymous"></script>
-
 </body>
 
 </html>

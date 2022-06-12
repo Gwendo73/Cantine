@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS Classe (
 
 CREATE TABLE IF NOT EXISTS TypeDeClasse (
   code_type integer primary key autoincrement,
-  type_classe TEXT NOT NULL
+  type_classe TEXT NOT NULL,
+  niveau_classe TEXT NOT NULL
 );
 
 -- --------------------------------------------------------
@@ -203,12 +204,19 @@ INSERT INTO Representant VALUES (3, 'HURSON', 'Cesar', '', '', 'churson');
 INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
 INSERT INTO Tarif VALUES (2, 'Tarif CAF', 2.8);
 
-INSERT INTO TypeDeClasse VALUES (1, 'Primaire');
-INSERT INTO TypeDeClasse VALUES (2, 'Maternelle');
+INSERT INTO TypeDeClasse VALUES (1, 'Maternelle', 'PS');
+INSERT INTO TypeDeClasse VALUES (2, 'Maternelle', 'MS');
+INSERT INTO TypeDeClasse VALUES (3, 'Maternelle', 'GS');
+INSERT INTO TypeDeClasse VALUES (4, 'Primaire', 'CP');
+INSERT INTO TypeDeClasse VALUES (5, 'Primaire', 'CE1');
+INSERT INTO TypeDeClasse VALUES (6, 'Primaire', 'CE2');
+INSERT INTO TypeDeClasse VALUES (7, 'Primaire', 'CM1');
+INSERT INTO TypeDeClasse VALUES (8, 'Primaire', 'CM2');
 
-INSERT INTO Classe VALUES (1, 'CP', 1);
-INSERT INTO Classe VALUES (2, 'CE1', 1);
-INSERT INTO Classe VALUES (3, 'CE2', 1);
+
+INSERT INTO Classe VALUES (1, 'CP', 4);
+INSERT INTO Classe VALUES (2, 'CE1', 5);
+INSERT INTO Classe VALUES (3, 'CE2', 6);
 
 INSERT INTO Formule VALUES (1, '1J');
 INSERT INTO Formule VALUES (2, '2J');
@@ -232,6 +240,9 @@ INSERT INTO Mange VALUES (4, 3);
 
 INSERT INTO Enseigne VALUES (1, 1);
 
-INSERT INTO Repas VALUES (1, '2022-06-07', 1);
+INSERT INTO Repas VALUES (1, '2022-06-16', 1);
+INSERT INTO Repas VALUES (2, '2022-06-16', 2);
+INSERT INTO Repas VALUES (3, '2022-06-16', 3);
+INSERT INTO Repas VALUES (4, '2022-06-17', 1);
 
 

@@ -13,7 +13,7 @@
 <body>
   <img style="width: 100%; height: 150px;"
     src="https://www.logarric.com/wp-content/uploads/2014/06/calendreta-lo-garric3.png" alt="">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg nav-fill navbar-dark bg-dark">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
           aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -25,6 +25,9 @@
               </li>
               <li class="nav-item float-right">
                   <a class="nav-link" btn-outline-success href="/infosEnseignants">Informations Enseignants</a>
+              </li>
+              <li class="nav-item float-right">
+                  <a class="nav-link" btn-outline-success href="/infosEnfants">Informations Enfants</a>
               </li>
               <li class="nav-item float-right">
                   <a class="nav-link" btn-outline-success href="/infosClasses">Informations Classes</a>
@@ -44,6 +47,7 @@
           </ul>
       </div>
   </nav>
+
 
   <div class="container mt-3">
     <form method="POST">
@@ -80,28 +84,15 @@
           <select name="tarif" class="form-control" id="tarif">
             {% for tarif in tarifs %}
               {% if enfant[3] == tarif[0] %}
-                <option value="{{ tarif[0] }}" selected>{{ tarif[1] }} : {{ tarif[2] }}</option>
+                <option value="{{ tarif[0] }}" selected>{{ tarif[1] }} : {{ tarif[2] }}€</option>
               {% else %}
-                <option value="{{ tarif[0] }}">{{ tarif[1] }} : {{ tarif[2] }}</option>
+                <option value="{{ tarif[0] }}">{{ tarif[1] }} : {{ tarif[2] }}€</option>
               {% endif %}
             {% endfor %}
           </select>
         </div>
       </div>
-      <div class="row mb-3">
-        <label for="formule" class="col-sm-2  col-form-label">Formule</label>
-        <div class="col-sm-10">
-          <select name="formule" class="form-control" id="formule">
-            {% for formule in formules %}
-              {% if enfant[6] == formule[0] %}
-                <option value="{{ formule[0] }}" selected>{{ formule[1] }}</option>
-              {% else %}
-                <option value="{{ formule[0] }}">{{ formule[1] }}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
-        </div>
-      </div>
+
       <input type="hidden" name="code" id="code" value="{{ enfant[0] }}">
       <button type="submit" class="btn btn-warning">Modifier</button>
       <a href="/suppressionE/{{ enfant[0] }}" class="btn btn-warning" onclick="return confirm('Voulez-vous vraiment supprimer cet enfant ?')">Supprimer l'Enfant</a>
