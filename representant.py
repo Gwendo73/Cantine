@@ -112,12 +112,7 @@ def info2():
             new_user = User(user[0], user[1])
 
             if bcrypt.check_password_hash(new_user.password, request.form["password"]):
-                error = 'Vous ne pouvez pas réutiliser un ancien mot de passe'
-                return render_template('R_modifInfo.html', error = error, info = info)
-
-            if request.form["password"] == request.form["password2"]:
-                password = bcrypt.generate_password_hash(request.form["password"])
-                cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, flask_login.current_user.name, ))
+                cur.execute("UPDATE Representant SET email=?,telephone=? WHERE identifiant = ?", (request.form["e-mail"],request.form["phone"], flask_login.current_user.name, ))
                 db.commit()
                 return redirect(url_for('info'))
 
@@ -126,6 +121,36 @@ def info2():
             
     return render_template('R_modifInfo.html', info = info)
 
+
+@app.route('/info3', methods = ["GET", "POST"])
+@login_required
+def info3():
+    db = get_db()
+    cur = db.cursor()
+    info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
+    if request.method== "POST": 
+        user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+        if user: 
+            new_user = User(user[0], user[1])
+            if bcrypt.check_password_hash(new_user.password, request.form["fpassword"]):
+                if bcrypt.check_password_hash(new_user.password, request.form["password"]):
+                    error = 'Vous ne pouvez pas réutiliser un ancien mot de passe'
+                    return render_template('R_modifInfosmdp.html', error = error, info = info)
+
+                if request.form["password"] == request.form["password2"]:
+                    password = bcrypt.generate_password_hash(request.form["password"])
+                    cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, flask_login.current_user.name, ))
+                    db.commit()
+                    return redirect(url_for('info'))
+
+                error = "Le mot de passe n'est pas le même"
+                return render_template('R_modifInfosmdp.html', error = error, info = info)
+
+            else :
+                error = "Le mot de passe n'est pas le bon"
+                return render_template("R_modifInfosmdp.html", error=error, info=info)
+                
+    return render_template('R_modifInfosmdp.html', info = info)
    
 
 @app.route('/accueil', methods = ["GET"])
@@ -179,3 +204,4 @@ def annuleRepas(code_repas):
     cur.execute("DELETE FROM Repas WHERE code_repas = ?", (code_repas, ))
     db.commit()
     return redirect(url_for('repas'))
+
