@@ -67,8 +67,11 @@ def connexion():
                 login_user(new_user)
                 if user[2] == 'Admin':
                     return redirect(url_for('accueilAdmin'))
-                return redirect(url_for('actu'))
-
+                if user[2] == 'Enseignant':
+                    return redirect(url_for('accueilEnseignant'))
+                if user[2] == 'Representant':
+                    return redirect(url_for('actu'))
+                
             else:
                 error = 'Invalid Username or Password'
                 return render_template('G_connexion.html', error=error)
