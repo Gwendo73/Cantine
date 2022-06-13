@@ -27,37 +27,44 @@ def inscription():
 def enfant(code_enfant):
     db = get_db()
     cur = db.cursor()
-    if request.method == "POST":
-        #cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (request.form["formule"], code_enfant, ))
-        #cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (request.form["repas"], code_enfant, ))
-        cur.execute("DELETE FROM Mange WHERE code_enfant = ?", (code_enfant, ))
-        i = 0
-        if request.form.getlist('Lundi'):
-            cur.execute("INSERT INTO Mange VALUES (?,?)", (request.form.getlist('Lundi')[0], code_enfant, ))
-            i += 1
-        if request.form.getlist('Mardi'):
-            cur.execute("INSERT INTO Mange VALUES (?,?)", (request.form.getlist('Mardi')[0], code_enfant, ))
-            i += 1
-        if request.form.getlist('Jeudi'):
-            cur.execute("INSERT INTO Mange VALUES (?,?)", (request.form.getlist('Jeudi')[0], code_enfant, ))
-            i += 1
-        if request.form.getlist('Vendredi'):
-            cur.execute("INSERT INTO Mange VALUES (?,?)", (request.form.getlist('Vendredi')[0], code_enfant, ))
-            i += 1
-        if i == 0:
-            i = 5
-        cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (i, code_enfant, ))
 
-        db.commit()
-        return redirect(url_for('accueil'))
     representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     enfant = cur.execute("SELECT * FROM Enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[0], )).fetchall()
     formules = cur.execute("SELECT * FROM Formule").fetchall()
     joursManges = cur.execute("SELECT J.code_jour FROM Mange AS M INNER JOIN Jour AS J ON M.code_jour = J.code_jour WHERE M.code_enfant = ?", (code_enfant, )).fetchall()
     jours = cur.execute("SELECT * FROM  Jour").fetchall()
+    allergies = cur.execute("SELECT * FROM Allergie").fetchall()
+    allergiques = cur.execute("SELECT code_allergie FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, )).fetchall()
+
+    if request.method == "POST":
+        cur.execute("DELETE FROM Mange WHERE code_enfant = ?", (code_enfant, ))
+        cur.execute("DELETE FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, ))
+        for allergie in allergies:
+            if request.form.getlist(allergie[1]):
+                cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (allergie[0], code_enfant,))
+        count = 0
+        for c in request.form["autre"]:
+            count += 1
+            print(count)
+        if count > 0:
+            print(count)
+            cur.execute("INSERT INTO Allergie(nom_allergie) VALUES (?)", (request.form["autre"],))
+            new_allergie = cur.execute("SELECT code_allergie FROM Allergie WHERE nom_allergie = ?", (request.form["autre"],)).fetchone()
+            cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (new_allergie[0], code_enfant,))
+        i = 0
+        for jour in jours:
+            if request.form.getlist(jour[1]):
+                cur.execute("INSERT INTO Mange VALUES (?,?)", (jour[0], code_enfant, ))
+                i += 1
+        if i == 0:
+            i = 5
+        cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (i, code_enfant, ))
+
+        db.commit()
+        return redirect(url_for('accueil'))
     now = datetime.datetime.today().strftime('%Y-%m-%d')
-    return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now, formules = formules, jours = jours, joursManges = joursManges)
+    return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now, formules = formules, jours = jours, joursManges = joursManges, allergies = allergies, allergiques = allergiques)
 
 @app.route('/facture', methods = ["GET"])
 @login_required
@@ -130,9 +137,9 @@ def info3():
     db = get_db()
     cur = db.cursor()
     info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
     if request.method== "POST": 
         user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
         if user: 
             new_user = User(user[0], user[1])
             if bcrypt.check_password_hash(new_user.password, request.form["fpassword"]):

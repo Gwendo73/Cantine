@@ -24,6 +24,8 @@ DROP TABLE Enseigne;
 DROP TABLE Formule;
 DROP TABLE Jour;
 DROP TABLE Mange;
+DROP TABLE EstAllergiqueA;
+DROP TABLE Allergie;
 --
 -- Base de données : `cantine`
 --
@@ -189,6 +191,32 @@ CREATE TABLE IF NOT EXISTS Enseigne (
   FOREIGN KEY (code_classe) REFERENCES Classe(code_classe)
 );
 
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `Allergie`
+--
+
+CREATE TABLE IF NOT EXISTS Allergie (
+  code_allergie integer PRIMARY KEY AUTOINCREMENT,
+  nom_allergie TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `EstAllergiqueA`
+--
+
+CREATE TABLE IF NOT EXISTS EstAllergiqueA (
+  code_allergie integer,
+  code_enfant integer,
+  PRIMARY KEY (code_allergie, code_enfant),
+  FOREIGN KEY (code_allergie) REFERENCES Allergie(code_allergie),
+  FOREIGN KEY (code_enfant) REFERENCES Enfant(code_enfant)
+);
+
+
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
 INSERT INTO Compte VALUES ('gartalle', 'test', 'Representant');
 INSERT INTO Compte VALUES ('clem', 'test', 'Representant');
@@ -203,6 +231,7 @@ INSERT INTO Representant VALUES (3, 'HURSON', 'Cesar', '', '', 'churson');
 
 INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
 INSERT INTO Tarif VALUES (2, 'Tarif CAF', 2.8);
+INSERT INTO Tarif VALUES (3, 'Tarif DGAC', 0.01);
 
 INSERT INTO TypeDeClasse VALUES (1, 'Maternelle', 'PS');
 INSERT INTO TypeDeClasse VALUES (2, 'Maternelle', 'MS');
@@ -212,7 +241,6 @@ INSERT INTO TypeDeClasse VALUES (5, 'Primaire', 'CE1');
 INSERT INTO TypeDeClasse VALUES (6, 'Primaire', 'CE2');
 INSERT INTO TypeDeClasse VALUES (7, 'Primaire', 'CM1');
 INSERT INTO TypeDeClasse VALUES (8, 'Primaire', 'CM2');
-
 
 INSERT INTO Classe VALUES (1, 'CP', 4);
 INSERT INTO Classe VALUES (2, 'CE1', 5);
@@ -245,4 +273,11 @@ INSERT INTO Repas VALUES (2, '2022-06-16', 2);
 INSERT INTO Repas VALUES (3, '2022-06-16', 3);
 INSERT INTO Repas VALUES (4, '2022-06-17', 1);
 
+INSERT INTO Allergie VALUES (1, 'Gluten');
+INSERT INTO Allergie VALUES (2, 'Arachides');
+INSERT INTO Allergie VALUES (3, 'Fruits de mer');
+INSERT INTO Allergie VALUES (4, 'Lactose');
+INSERT INTO Allergie VALUES (5, 'Oeufs');
+INSERT INTO Allergie VALUES (6, 'Fruits');
 
+INSERT INTO EstAllergiqueA VALUES (1, 1);

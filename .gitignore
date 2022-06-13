@@ -1,4 +1,4 @@
 __pycache__
 venv
-cantine2.db
-.$SGBD.drawio.bkp
+db/cantine2.db
+documents/.$SGBD.drawio.bkp
