@@ -63,7 +63,7 @@
             <input type="hidden" name="code" id="code" value="{{ enfant[0] }}">
             <button type="submit" class="btn btn-warning">Modifier</button>
             <a href="/suppressionE/{{ enfant[0] }}" class="btn btn-warning"
-                onclick="return confirm('Voulez-vous vraiment supprimer cet enfant ?')">Supprimer l'Enfant</a>
+                onclick="if (confirm('Voulez-vous vraiment supprimer cet enfant ?')) commentDelete(1); return false">Supprimer l'Enfant</a>
             <a href="/detailsFamille/{{ enfant[5] }}" class="btn btn-warning">Retour</a>
 
         </form>

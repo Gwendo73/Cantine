@@ -35,7 +35,7 @@
                     <td>{{ repa[1] }}</td>
                     {% if repa[1] > date_limite %}
                     <td><a class="btn btn-warning" href="/annuleRepas/{{ repa[0] }}"
-                            onclick="confirm('Voulez-vous vraiment annuler le repas ?')">Annuler</a></td>
+                            onclick="if (confirm('Voulez-vous vraiment annuler le repas ?')) commentDelete(1); return false">Annuler</a></td>
                     {% endif %}
                 </tr>
                 {% endif %}

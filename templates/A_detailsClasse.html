@@ -42,7 +42,7 @@
             <a href="/lierEnseignant/{{ classe[1] }}" class="btn btn-warning">Lier à un enseignant</a>
             {% if not enfants %}
             <a href="/suppressionC/{{ classe[1] }}" class="btn btn-warning"
-                onclick="return confirm('Voulez-vous vraiment supprimer cette classe ?')">Supprimer la Classe</a>
+                onclick="if (confirm('Voulez-vous vraiment supprimer cette classe ?')) commentDelete(1); return false">Supprimer la Classe</a>
             {% endif %}
             <a href="/infosClasses" class="btn btn-warning">Retour</a>
 

@@ -44,9 +44,9 @@
             <button type="submit" class="btn btn-warning">Valider les modifications</button>
             <a href="/lierClasse/{{ enseignant[0] }}" class="btn btn-warning">Lier à une classe</a>
             <a href="/suppressionEns/{{ enseignant[0] }}" class="btn btn-warning"
-                onclick="return confirm('Voulez-vous vraiment supprimer ce compte ?')">Supprimer le Compte</a>
+                onclick="if (confirm('Voulez-vous vraiment supprimer ce compte ?')) commentDelete(1); return false">Supprimer le Compte</a>
             <a href="/modifMDPE/{{ enseignant[0] }}" class="btn btn-warning"
-                onclick="return confirm('Voulez-vous vraiment reinitialiser le mot de passe ?')">Réinitialiser le mot de
+                onclick="if (confirm('Voulez-vous vraiment reinitialiser le mot de passe ?')) commentDelete(1); return false">Réinitialiser le mot de
                 passe</a>
             <a href="/infosEnseignants" class="btn btn-warning">Retour</a>
 

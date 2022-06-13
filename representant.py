@@ -98,7 +98,8 @@ def info():
     cur = db.cursor()
     info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
     compte = cur.execute("SELECT * from Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    return render_template('R_info.html', info = info, compte = compte)
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+    return render_template('R_info.html', info = info, compte = compte, enfants= enfants)
 
 @app.route('/info2', methods = ["GET", "POST"])
 @login_required
@@ -106,6 +107,7 @@ def info2():
     db = get_db()
     cur = db.cursor()
     info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
+    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
     if request.method== "POST": 
         user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
         if user:
@@ -117,9 +119,9 @@ def info2():
                 return redirect(url_for('info'))
 
             error = "Le mot de passe n'est pas le même"
-            return render_template('R_modifInfo.html', error = error, info = info)
+            return render_template('R_modifInfo.html', error = error, info = info, enfants = enfants)
             
-    return render_template('R_modifInfo.html', info = info)
+    return render_template('R_modifInfo.html', info = info, enfants = enfants)
 
 
 @app.route('/info3', methods = ["GET", "POST"])
@@ -130,12 +132,13 @@ def info3():
     info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
     if request.method== "POST": 
         user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
         if user: 
             new_user = User(user[0], user[1])
             if bcrypt.check_password_hash(new_user.password, request.form["fpassword"]):
                 if bcrypt.check_password_hash(new_user.password, request.form["password"]):
                     error = 'Vous ne pouvez pas réutiliser un ancien mot de passe'
-                    return render_template('R_modifInfosmdp.html', error = error, info = info)
+                    return render_template('R_modifInfosmdp.html', error = error, info = info, enfants = enfants)
 
                 if request.form["password"] == request.form["password2"]:
                     password = bcrypt.generate_password_hash(request.form["password"])
@@ -144,13 +147,13 @@ def info3():
                     return redirect(url_for('info'))
 
                 error = "Le mot de passe n'est pas le même"
-                return render_template('R_modifInfosmdp.html', error = error, info = info)
+                return render_template('R_modifInfosmdp.html', error = error, info = info, enfants = enfants)
 
             else :
                 error = "Le mot de passe n'est pas le bon"
-                return render_template("R_modifInfosmdp.html", error=error, info=info)
+                return render_template("R_modifInfosmdp.html", error=error, info=info, enfants = enfants)
                 
-    return render_template('R_modifInfosmdp.html', info = info)
+    return render_template('R_modifInfosmdp.html', info = info, enfants = enfants)
    
 
 @app.route('/accueil', methods = ["GET"])
@@ -170,7 +173,6 @@ def ajoutRepas():
     enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
     if request.method == "POST":
         date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
-        print(date)
         for enfant in enfants:
             if request.form.getlist(enfant[1]):
                 check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date, enfant[0])).fetchone()
