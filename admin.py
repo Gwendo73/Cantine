@@ -18,7 +18,9 @@ def accueilAdmin():
             error = 'Les mots de passes sont différents'
             return render_template('A_accueilAdmin.html', error = error)
         return render_template('A_accueilAdmin.html')
-    return redirect(url_for('accueil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### AJOUT ENFANT
 
@@ -41,7 +43,9 @@ def ajouterEnfant(code_rep):
             db.commit()
             return redirect(url_for('detailsFamille', code_rep = request.form["code"]))
         return render_template('A_ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs, formules = formules)
-    return redirect(url_for('acceuil'))   
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil')) 
 
 ### COMPTES
 
@@ -68,7 +72,9 @@ def comptes():
                 return render_template('A_comptes.html', msg = 'Compte créé avec succès')
             return render_template('A_comptes.html', error = 'Les mots de passe ne correspondent pas')
         return render_template('A_comptes.html')
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### CREATION CLASSE
 
@@ -89,7 +95,9 @@ def creerClasse():
             db.commit()
             return redirect(url_for('infosClasses'))
         return render_template('A_creerClasse.html', types_classe = types_classe, classes = classes)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### CREATION TARIF 
 
@@ -110,7 +118,9 @@ def creerTarif():
             db.commit()
             return redirect(url_for('infosTarifs'))
         return render_template('A_creerTarif.html')
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### DETAILS CLASSE
 
@@ -130,7 +140,9 @@ def detailsClasse(code_classe):
             db.commit()
             return redirect(url_for('infosClasses'))
         return render_template('A_detailsClasse.html', enseignants = enseignants, enfants = enfants, classe = classe, types = types)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### DETAILS ENFANT 
 
@@ -152,7 +164,9 @@ def detailsEnfant(code_enf):
         formules = cur.execute("SELECT * FROM Formule").fetchall()
         enfant = cur.execute("SELECT code_enfant, nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant FROM Enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
         return render_template('A_detailsEnfant.html', enfant = enfant, tarifs = tarifs, formules = formules, classes = classes)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### DETAILS ENSEIGNANT
 
@@ -173,7 +187,9 @@ def detailsEnseignant(code_ens):
         enseignant = cur.execute("SELECT Ens.*, C.mot_de_passe FROM Enseignant AS Ens INNER JOIN Compte AS C ON Ens.identifiant = C.identifiant WHERE Ens.code_enseignant = ?", (code_ens, )).fetchone()
         classes = cur.execute("SELECT C.* FROM Classe AS C INNER JOIN Enseigne AS E ON C.code_classe = E.code_classe WHERE E.code_enseignant = ? ORDER BY code_type, nom_classe" ,  (code_ens, )).fetchall()
         return render_template('A_detailsEnseignant.html', enseignant = enseignant, classes = classes)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### DETAILS FAMILLE
 
@@ -192,7 +208,9 @@ def detailsFamille(code_rep):
         representant = cur.execute("SELECT R.*, C.mot_de_passe FROM Representant AS R INNER JOIN Compte AS C ON R.identifiant = C.identifiant WHERE R.code_representant = ?", (code_rep, )).fetchone()
         enfants = cur.execute("SELECT E.nom_enfant, E.prenom_enfant, C.nom_classe, E.code_enfant FROM Enfant AS E INNER JOIN Classe AS C ON E.code_classe = C.code_classe WHERE code_representant = ? ORDER BY E.nom_enfant, E.prenom_enfant" ,  (code_rep, )).fetchall()
         return render_template('A_detailsFamille.html', representant = representant, enfants = enfants)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### DETAILS TARIF
 
@@ -210,7 +228,9 @@ def detailsTarif(code_tarif):
             db.commit()
             return redirect(url_for('infosTarifs'))
         return render_template('A_detailsTarif.html', enfants = enfants, tarif = tarif)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### INFOS CLASSES
 
@@ -223,6 +243,9 @@ def infosClasses():
     if user[0] == 'Admin':
         classes = cur.execute("SELECT C.code_classe, C.nom_classe, T.niveau_classe, T.type_classe FROM Classe AS C INNER JOIN TypeDeClasse AS T ON C.code_type = T.code_type ORDER BY C.code_type, C.nom_classe").fetchall()
         return render_template('A_infosClasses.html', classes=classes)
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### INFOS ENFANTS
 
@@ -237,7 +260,9 @@ def infosEnfants():
         "INNER JOIN Classe AS C ON E.code_classe = C.code_classe INNER JOIN Tarif AS T ON T.code_tarif = E.code_tarif "
         "INNER JOIN Representant AS R ON R.code_representant = E.code_representant ORDER BY E.nom_enfant, E.prenom_enfant").fetchall()
         return render_template('A_infosEnfants.html', enfants=enfants)
-    return redirect(url_for('accueil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ###  INFOS ENSEIGNANTS
 
@@ -250,6 +275,9 @@ def infosEnseignants():
     if user[0] == 'Admin':
         enseignants = cur.execute("SELECT * FROM Enseignant ORDER BY nom_enseignant, prenom_enseignant").fetchall()
         return render_template('A_infosEnseignants.html', enseignants=enseignants)
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### INFOS FAMILLE
 
@@ -262,7 +290,9 @@ def infosFamille():
     if user[0] == 'Admin':
         representants = cur.execute("SELECT * FROM Representant ORDER BY nom_representant, prenom_representant").fetchall()
         return render_template('A_infosFamilles.html', representants=representants)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### INFOS TARIFS
 
@@ -275,6 +305,9 @@ def infosTarifs():
     if user[0] == 'Admin':
         tarifs = cur.execute("SELECT * FROM tarif").fetchall()
         return render_template('A_infosTarifs.html', tarifs=tarifs)
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### LIAISON CLASSE
 
@@ -296,7 +329,9 @@ def lierClasse(code_ens):
             db.commit()
             return redirect(url_for('detailsEnseignant', code_ens = code_ens))
         return render_template('A_lierClasse.html', enseignant = enseignant, classes = classes, enseignes = enseignes)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### LIAISON ENSEIGNANT
 
@@ -319,7 +354,9 @@ def lierEnseignant(code_classe):
             db.commit()
             return redirect(url_for('detailsClasse', code_classe = code_classe))
         return render_template('A_lierEnseignant.html', enseignants = enseignants, classe = classe, enseignes = enseignes)
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### MODIFICATION MDP ENSEIGNANT
 
@@ -335,7 +372,9 @@ def modifMDPE(code_ens):
         cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, enseignant[0], ))
         db.commit()
         return redirect(url_for('detailsEnseignant', code_ens = code_ens))
-    return redirect(url_for('accueil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### MODIFICATION MDP REPRESENTANT
 
@@ -351,7 +390,9 @@ def modifMDPR(code_rep):
         cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, representant[0], ))
         db.commit()
         return redirect(url_for('detailsFamille', code_rep = code_rep))
-    return redirect(url_for('accueil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### SUPPRESSION CLASSE
 
@@ -368,7 +409,9 @@ def suppressionC(code_classe):
             cur.execute("DELETE FROM Enseigne WHERE code_classe = ?", (code_classe, ))
             db.commit()
         return redirect(url_for('infosClasses'))
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### SUPPRESSION ENFANT
 
@@ -383,7 +426,9 @@ def suppressionE(code_enf):
         cur.execute("DELETE FROM Enfant WHERE code_enfant = ?", (code_enf, ))
         db.commit()
         return redirect(url_for('detailsFamille', code_rep = code[0]))
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### SUPPRESSION ENSEIGNANT
 
@@ -400,7 +445,9 @@ def suppressionEns(code_ens):
         cur.execute("DELETE FROM Enseignant WHERE code_enseignant = ?", (code_ens, ))
         db.commit()
         return redirect(url_for('infosEnseignants'))
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### SUPPRESSION REPRESENTANT
 
@@ -417,7 +464,9 @@ def suppressionR(code_rep):
         cur.execute("DELETE FROM Enfant WHERE code_representant = ?", (code_rep, ))
         db.commit()
         return redirect(url_for('infosFamilles'))
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))
 
 ### SUPPRESSION TARIF
 
@@ -433,4 +482,6 @@ def suppressionT(code_tarif):
             cur.execute("DELETE FROM Tarif WHERE code_tarif = ?", (code_tarif, ))
             db.commit()
         return redirect(url_for('infosTarifs'))
-    return redirect(url_for('acceuil'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return render_template(url_for('accueil'))

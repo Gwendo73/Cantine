@@ -7,8 +7,13 @@ from main import *
 def accueil():
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    return render_template('R_accueil.html', enfants = enfants)
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        return render_template('R_accueil.html', enfants = enfants)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### ACTU 
 
@@ -17,8 +22,13 @@ def accueil():
 def actu():
     db = get_db()
     cur = db.cursor()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
-    return render_template('R_actualites.html', enfants = enfants)
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
+        return render_template('R_actualites.html', enfants = enfants)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### AJOUT REPAS
 
@@ -27,21 +37,27 @@ def actu():
 def ajoutRepas():
     db = get_db()
     cur = db.cursor()
-    now = datetime.datetime.today()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    if request.method == "POST":
-        date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
-        for enfant in enfants:
-            if request.form.getlist(enfant[1]):
-                check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date, enfant[0])).fetchone()
-                if not check and int(date.strftime('%d')) >= int(now.day) + 2:
-                    cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date.strftime('%Y-%m-%d'), enfant[0]))
-                    msg = "Repas réservé avec succès"
-                else:
-                    msg = "Le repas n'a pas été réservé car la réservation est trop tardive"
-            db.commit()
-        return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'), msg = msg)
-    return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'))
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        now = datetime.datetime.today()
+        newDate = now.replace(day = int(now.day) + 2)
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        if request.method == "POST":
+            date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
+            for enfant in enfants:
+                if request.form.getlist(enfant[1]):
+                    check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date, enfant[0])).fetchone()
+                    if not check and date >= newDate:
+                        cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date.strftime('%Y-%m-%d'), enfant[0]))
+                        msg = "Repas réservé avec succès"
+                    else:
+                        msg = "Le repas n'a pas été réservé car la réservation est trop tardive"
+                db.commit()
+            return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'), msg = msg)
+        return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'))
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### ANNULATION REPAS 
 
@@ -50,28 +66,43 @@ def ajoutRepas():
 def annuleRepas(code_repas):
     db = get_db()
     cur = db.cursor()
-    cur.execute("DELETE FROM Repas WHERE code_repas = ?", (code_repas, ))
-    db.commit()
-    return redirect(url_for('repas'))
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        cur.execute("DELETE FROM Repas WHERE code_repas = ?", (code_repas, ))
+        db.commit()
+        return redirect(url_for('repas'))
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### DETAILS FACTURE
 
 @app.route('/detailsFacture/<int:code_mois>', methods = ["GET"])
 @login_required
 def detailsFacture(code_mois):
-    now = datetime.datetime.today().strftime('%d-%m-%Y')
     db = get_db()
     cur = db.cursor()
-    if code_mois < 10:
-        code_mois = '0' + str(code_mois)
-    else:
-        code_mois = str(code_mois)
-    repas = cur.execute("SELECT R.date_repas, E.prenom_enfant, T.tarif FROM Repas AS R INNER JOIN Enfant AS E ON R.code_enfant = E.code_enfant "
-     "INNER JOIN Representant AS Re ON Re.code_representant = E.code_representant INNER JOIN Tarif AS T ON E.code_tarif = T.code_tarif " 
-     "WHERE Re.identifiant = ? AND strftime('%m', date_repas) = ? ORDER BY E.code_enfant, R.date_repas", (flask_login.current_user.name, code_mois, )).fetchall()
-    representant = cur.execute("SELECT nom_representant, prenom_representant, code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[2], )).fetchall()
-    return render_template('R_detailsFacture.html', now = now, repas = repas, representant = representant, enfants = enfants)
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        now = datetime.datetime.today().strftime('%d-%m-%Y')
+        if code_mois < 10:
+            code_mois = '0' + str(code_mois)
+        else:
+            code_mois = str(code_mois)
+        if int(code_mois) < 13 and int(code_mois) > 7:
+            year = str(datetime.datetime.today().year - 1)
+        else:
+            year = str(datetime.datetime.today().year)
+        repas = cur.execute("SELECT R.date_repas, E.prenom_enfant, T.tarif FROM Repas AS R INNER JOIN Enfant AS E ON R.code_enfant = E.code_enfant "
+        "INNER JOIN Representant AS Re ON Re.code_representant = E.code_representant INNER JOIN Tarif AS T ON E.code_tarif = T.code_tarif " 
+        "WHERE Re.identifiant = ? AND strftime('%m', date_repas) = ? AND strftime('%Y', date_repas) = ? ORDER BY E.code_enfant, R.date_repas", (flask_login.current_user.name, code_mois, year, )).fetchall()
+        representant = cur.execute("SELECT nom_representant, prenom_representant, code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[2], )).fetchall()
+        date = datetime.datetime(int(year), int(code_mois), 1).strftime('%Y%m')
+        return render_template('R_detailsFacture.html', now = now, repas = repas, representant = representant, enfants = enfants, date = date)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### ENFANT
 
@@ -80,46 +111,49 @@ def detailsFacture(code_mois):
 def enfant(code_enfant):
     db = get_db()
     cur = db.cursor()
-
-    representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    enfant = cur.execute("SELECT nom_enfant, prenom_enfant, code_formule FROM Enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[0], )).fetchall()
-    formules = cur.execute("SELECT * FROM Formule").fetchall()
-    joursManges = cur.execute("SELECT J.code_jour FROM Mange AS M INNER JOIN Jour AS J ON M.code_jour = J.code_jour WHERE M.code_enfant = ?", (code_enfant, )).fetchall()
-    jours = cur.execute("SELECT * FROM Jour").fetchall()
-    allergies = cur.execute("SELECT * FROM Allergie").fetchall()
-    allergiques = cur.execute("SELECT code_allergie FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, )).fetchall()
-    now = datetime.datetime.today().strftime('%Y-%m-%d')
-    if request.method == "POST":
-        cur.execute("DELETE FROM Mange WHERE code_enfant = ?", (code_enfant, ))
-        cur.execute("DELETE FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, ))
-        for allergie in allergies:
-            if request.form.getlist(allergie[1]):
-                cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (allergie[0], code_enfant,))
-        count = 0
-        for c in request.form["autre"]:
-            count += 1
-            print(count)
-        if count > 0:
-            print(count)
-            cur.execute("INSERT INTO Allergie(nom_allergie) VALUES (?)", (request.form["autre"],))
-            new_allergie = cur.execute("SELECT code_allergie FROM Allergie WHERE nom_allergie = ?", (request.form["autre"],)).fetchone()
-            cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (new_allergie[0], code_enfant,))
-        i = 0
-        for jour in jours:
-            if request.form.getlist(jour[1]):
-                cur.execute("INSERT INTO Mange VALUES (?,?)", (jour[0], code_enfant, ))
-                i += 1
-        if i == 0:
-            i = 5
-        cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (i, code_enfant, ))
-
-        db.commit()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
         enfant = cur.execute("SELECT nom_enfant, prenom_enfant, code_formule FROM Enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[0], )).fetchall()
+        formules = cur.execute("SELECT * FROM Formule").fetchall()
         joursManges = cur.execute("SELECT J.code_jour FROM Mange AS M INNER JOIN Jour AS J ON M.code_jour = J.code_jour WHERE M.code_enfant = ?", (code_enfant, )).fetchall()
+        jours = cur.execute("SELECT * FROM Jour").fetchall()
+        allergies = cur.execute("SELECT * FROM Allergie").fetchall()
         allergiques = cur.execute("SELECT code_allergie FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, )).fetchall()
+        now = datetime.datetime.today().strftime('%Y-%m-%d')
+        if request.method == "POST":
+            cur.execute("DELETE FROM Mange WHERE code_enfant = ?", (code_enfant, ))
+            cur.execute("DELETE FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, ))
+            for allergie in allergies:
+                if request.form.getlist(allergie[1]):
+                    cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (allergie[0], code_enfant,))
+            count = 0
+            for c in request.form["autre"]:
+                count += 1
+                print(count)
+            if count > 0:
+                print(count)
+                cur.execute("INSERT INTO Allergie(nom_allergie) VALUES (?)", (request.form["autre"],))
+                new_allergie = cur.execute("SELECT code_allergie FROM Allergie WHERE nom_allergie = ?", (request.form["autre"],)).fetchone()
+                cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (new_allergie[0], code_enfant,))
+            i = 0
+            for jour in jours:
+                if request.form.getlist(jour[1]):
+                    cur.execute("INSERT INTO Mange VALUES (?,?)", (jour[0], code_enfant, ))
+                    i += 1
+            if i == 0:
+                i = 5
+            cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (i, code_enfant, ))
+
+            db.commit()
+            enfant = cur.execute("SELECT nom_enfant, prenom_enfant, code_formule FROM Enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
+            joursManges = cur.execute("SELECT J.code_jour FROM Mange AS M INNER JOIN Jour AS J ON M.code_jour = J.code_jour WHERE M.code_enfant = ?", (code_enfant, )).fetchall()
+            allergiques = cur.execute("SELECT code_allergie FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, )).fetchall()
         return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now, formules = formules, jours = jours, joursManges = joursManges, allergies = allergies, allergiques = allergiques)
-    return render_template('R_enfant.html', enfants = enfants, enfant = enfant, now = now, formules = formules, jours = jours, joursManges = joursManges, allergies = allergies, allergiques = allergiques)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### FACTURE
 
@@ -128,15 +162,19 @@ def enfant(code_enfant):
 def facture():
     db = get_db()
     cur = db.cursor()
-    months = ["Aout","Septembre","Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
-    year = datetime.datetime.today().year
-    year1 = year - 1
-    mois = datetime.datetime.today().month
-    print(mois)
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    if request.method == "POST":
-        return redirect(url_for('detailsFacture', code_mois = request.form["facture"]))
-    return render_template('R_facture.html', year = year, months = months, mois = mois ,year1 = year1, enfants = enfants)
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        months = ["Aout","Septembre","Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+        year = datetime.datetime.today().year
+        year1 = year - 1
+        mois = datetime.datetime.today().month
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        if request.method == "POST":
+            return redirect(url_for('detailsFacture', code_mois = request.form["facture"]))
+        return render_template('R_facture.html', year = year, months = months, mois = mois ,year1 = year1, enfants = enfants)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### INFO 1
 
@@ -145,10 +183,15 @@ def facture():
 def info():
     db = get_db()
     cur = db.cursor()
-    info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
-    compte = cur.execute("SELECT * from Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    return render_template('R_info.html', info = info, compte = compte, enfants = enfants)
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
+        compte = cur.execute("SELECT * from Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        return render_template('R_info.html', info = info, compte = compte, enfants = enfants)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### INFO 2
 
@@ -157,22 +200,27 @@ def info():
 def info2():
     db = get_db()
     cur = db.cursor()
-    info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    if request.method== "POST": 
-        user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-        if user:
-            new_user = User(user[0], user[1])
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        if request.method== "POST": 
+            user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+            if user:
+                new_user = User(user[0], user[1])
 
-            if bcrypt.check_password_hash(new_user.password, request.form["password"]):
-                cur.execute("UPDATE Representant SET email=?,telephone=? WHERE identifiant = ?", (request.form["e-mail"],request.form["phone"], flask_login.current_user.name, ))
-                db.commit()
-                return redirect(url_for('info'))
+                if bcrypt.check_password_hash(new_user.password, request.form["password"]):
+                    cur.execute("UPDATE Representant SET email=?,telephone=? WHERE identifiant = ?", (request.form["e-mail"],request.form["phone"], flask_login.current_user.name, ))
+                    db.commit()
+                    return redirect(url_for('info'))
 
-            error = "Le mot de passe n'est pas le même"
-            return render_template('R_modifInfo.html', error = error, info = info, enfants = enfants)
-            
-    return render_template('R_modifInfo.html', info = info, enfants = enfants)
+                error = "Le mot de passe n'est pas le même"
+                return render_template('R_modifInfo.html', error = error, info = info, enfants = enfants)
+                
+        return render_template('R_modifInfo.html', info = info, enfants = enfants)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 
 ### INFO 3
@@ -182,31 +230,36 @@ def info2():
 def info3():
     db = get_db()
     cur = db.cursor()
-    info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-    if request.method== "POST": 
-        user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-        if user: 
-            new_user = User(user[0], user[1])
-            if bcrypt.check_password_hash(new_user.password, request.form["fpassword"]):
-                if bcrypt.check_password_hash(new_user.password, request.form["password"]):
-                    error = 'Vous ne pouvez pas réutiliser un ancien mot de passe'
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        if request.method== "POST": 
+            user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+            if user: 
+                new_user = User(user[0], user[1])
+                if bcrypt.check_password_hash(new_user.password, request.form["fpassword"]):
+                    if bcrypt.check_password_hash(new_user.password, request.form["password"]):
+                        error = 'Vous ne pouvez pas réutiliser un ancien mot de passe'
+                        return render_template('R_modifInfosmdp.html', error = error, info = info, enfants = enfants)
+
+                    if request.form["password"] == request.form["password2"]:
+                        password = bcrypt.generate_password_hash(request.form["password"])
+                        cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, flask_login.current_user.name, ))
+                        db.commit()
+                        return redirect(url_for('info'))
+
+                    error = "Le mot de passe n'est pas le même"
                     return render_template('R_modifInfosmdp.html', error = error, info = info, enfants = enfants)
 
-                if request.form["password"] == request.form["password2"]:
-                    password = bcrypt.generate_password_hash(request.form["password"])
-                    cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, flask_login.current_user.name, ))
-                    db.commit()
-                    return redirect(url_for('info'))
-
-                error = "Le mot de passe n'est pas le même"
-                return render_template('R_modifInfosmdp.html', error = error, info = info, enfants = enfants)
-
-            else :
-                error = "Le mot de passe n'est pas le bon"
-                return render_template("R_modifInfosmdp.html", error=error, info=info, enfants = enfants)
-                
-    return render_template('R_modifInfosmdp.html', info = info, enfants = enfants)
+                else :
+                    error = "Le mot de passe n'est pas le bon"
+                    return render_template("R_modifInfosmdp.html", error=error, info=info, enfants = enfants)
+                    
+        return render_template('R_modifInfosmdp.html', info = info, enfants = enfants)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
 ### INSCRIPTION
 
@@ -233,21 +286,110 @@ def inscription():
     
 ### REPAS
 
-@app.route('/repas', methods = ["GET"])
+@app.route('/repas', methods = ["GET", "POST"])
 @login_required
 def repas():
     db = get_db()
     cur = db.cursor()
-    code_rep = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    enfants = cur.execute("SELECT code_enfant, prenom_enfant, nom_enfant FROM Enfant WHERE code_representant = ?", (code_rep[0], )).fetchall()
-    repas = []
-    now = datetime.datetime.today()
-    date = now.strftime('%Y-%m-%d')
-    for enfant in enfants:
-        repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas >= ? ORDER BY date_repas", (enfant[0], date , )).fetchall())
-    limit = int(now.day) + 2
-    date_limite = now.replace(day = limit)
-    return render_template('R_repas.html', enfants = enfants, repasEnfants = repas, date_limite = date_limite.strftime('%d-%m-%Y'))
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Representant':
+        code_rep = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant, nom_enfant FROM Enfant WHERE code_representant = ?", (code_rep[0], )).fetchall()
+        repas = []
+        year = datetime.datetime.today().year
+        year1 = year - 1
+        mois = datetime.datetime.today().month
+        now = datetime.datetime.today()
+        months = listeMois(mois)
+        new_dateB = datetime.datetime(year, int(now.month), now.day)
+        lastDay = last_day_of_month(new_dateB)
+        new_dateE = datetime.datetime(year, int(now.month), lastDay.day)
+        limit = int(now.day) + 2
+        date_limite = now.replace(day = limit)
+        if request.method == "POST":
+            code_mois = index(request.form["repas"])
+            if code_mois < 13 and code_mois > 7:
+                year = int(datetime.datetime.today().year - 1)
+            else:
+                year = int(datetime.datetime.today().year)
+            if request.form["repas"] == months[0]:
+                day = now.day
+            else:
+                day = 1
+            new_dateB = datetime.datetime(year, code_mois, day)
+            lastDay = last_day_of_month(new_dateB)
+            new_dateE = datetime.datetime(year, code_mois, lastDay.day)
+            mois = request.form["repas"]
+        for enfant in enfants:
+            repas.append(cur.execute("SELECT * FROM Repas WHERE code_enfant = ? AND date_repas >= ? AND date_repas <= ? ORDER BY date_repas", (enfant[0], new_dateB.strftime('%Y-%m-%d') , new_dateE.strftime('%Y-%m-%d'), )).fetchall())
+        return render_template('R_repas.html', enfants = enfants, repasEnfants = repas, date_limite = date_limite.strftime('%Y-%m-%d'), year = year, months = months, mois = mois ,year1 = year1)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return render_template(url_for('accueilEnseignant'))
 
+### Utilisé dans Repas, permet de connaitre la derniere date d'un mois
+def last_day_of_month(any_day):
+    # this will never fail
+    # get close to the end of the month for any day, and add 4 days 'over'
+    next_month = any_day.replace(day=28) + datetime.timedelta(days=4)
+    # subtract the number of remaining 'overage' days to get last day of current month, or said programattically said, the previous day of the first of next month
+    return next_month - datetime.timedelta(days=next_month.day)
+
+### Utilisé dans Repas pour avoir la liste des futurs en mois en focntion du mois actuel
+def listeMois(mois):
+    if mois == 1:
+        months = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 2:
+        months = ["Février","Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 3:
+        months = ["Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 4:
+        months = ["Avril","Mai","Juin","Juillet"]
+    if mois == 5:
+        months = ["Mai","Juin","Juillet"]
+    if mois == 6:
+        months = ["Juin","Juillet"]
+    if mois == 7:
+        months = ["Juillet"]
+    if mois == 8:
+        months = ["Aout","Septembre","Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 9:
+        months = ["Septembre","Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 10:
+        months = ["Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 11:
+        months = ["Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+    if mois == 12:
+        months = ["Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
+    return months
+
+### Utilisé dans repas, permet d'avoir le numéro du mois associé
+def index(mois):
+    if mois == "Janvier":
+        return 1
+    if mois == "Février":
+        return 2
+    if mois == "Mars":
+        return 3
+    if mois == "Avril":
+        return 4
+    if mois == "Mai":
+        return 5
+    if mois == "Juin":
+        return 6
+    if mois == "Juillet":
+        return 7
+    if mois == "Aout":
+        return 8
+    if mois == "Septembre":
+        return 9
+    if mois == "Octobre":
+        return 10
+    if mois == "Novembre":
+        return 11
+    if mois == "Décembre":
+        return 12
+    
+        
 
 

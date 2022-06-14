@@ -13,10 +13,34 @@
     {% block content %}
     <div class="container mt-3 mb-3">
         <h1>Futurs repas des enfants</h1>
+        <form method="post">
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="repas">Mois des repas</label>
+                <div class="col-sm-10">
+                    <select name="repas" class="form-control" id="repas">
+                        {% for month in months %}
+                            {% if month == mois %}
+                                {% if months|length < 7 %} 
+                                    <option value="{{ month }}" selected>{{ month }} {{ year }}</option>
+                                {% else %}
+                                    <option value="{{ month }}" selected>{{ month }} {{ year1 }}</option>
+                                {% endif %}
+                            {% else %}
+                                {% if months|length < 7 %} 
+                                    <option value="{{ month }}">{{ month }} {{ year }}</option>
+                                {% else %}
+                                    <option value="{{ month }}">{{ month }} {{ year1 }}</option>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-warning">Valider</button>
+        </form>
         <p>/!\ Les repas peuvent être annulés au plus tard 48h avant celui-ci /!\</p>
         <p>Annulation possible à partir du {{date_limite}}</p>
         {% for enfant in enfants %}
-        {% if repasEnfants[0] %}
         <h2>{{ enfant[2] }} {{ enfant[1] }}</h2>
         <table class="table table-stripped">
             <thead>
@@ -30,7 +54,7 @@
                 {% if repa[2] == enfant[0] %}
                 <tr>
                     <td scope="row">{{ repa[1] }}</td>
-                    {% if repa[1] > date_limite %}
+                    {% if repa[1] >= date_limite %}
                     <td><a class="btn btn-warning" href="/annuleRepas/{{ repa[0] }}"
                             onclick="if (confirm('Voulez-vous vraiment annuler le repas ?')) commentDelete(1); return false">Annuler</a>
                     </td>
@@ -43,7 +67,6 @@
             </tbody>
 
         </table>
-        {% endif %}
         {% endfor %}
         <a class="btn btn-warning" href="/ajoutRepas">Ajouter un repas</a>
     </div>
