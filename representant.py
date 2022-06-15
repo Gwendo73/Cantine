@@ -40,10 +40,11 @@ def ajoutRepas():
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
         now = datetime.datetime.today()
-        newDate = now.replace(day = int(now.day) + 2) #datetime.timedelta())
+        newDate = now + datetime.timedelta(days = 2)
         enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
         if request.method == "POST":
             date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
+            msg = None
             for enfant in enfants:
                 if request.form.getlist(enfant[1]):
                     check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date.strftime('%Y-%m-%d'), enfant[0], )).fetchone()
@@ -51,9 +52,15 @@ def ajoutRepas():
                     if not check and date >= newDate and checkConge == None:
                         cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date.strftime('%Y-%m-%d'), enfant[0]))
                         msg = "Repas réservé avec succès"
-                    else:
-                        msg = "Le repas n'a pas été réservé car la réservation est trop tardive ou le repas est déjà réservé ou ce jour est en congé"
-                db.commit()
+                    if check:
+                        msg = "Le repas est déjà réservé"
+                    if date >= newDate:
+                        msg = "La date de réservation est de moins de 48h"
+                    if checkConge:
+                        msg = "Il n'y a pas école ce jour là"
+            if msg == None:
+                msg = "Aucun enfant sélectionné"
+            db.commit()
             return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'), msg = msg)
         return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'))
     if user[0] == 'Admin':

@@ -5,4 +5,12 @@ body{
         margin: 0px;
 }
 
+.page-item.active .page-link {
+    color: #fff !important;
+    background: #ffc107 !important;
+}
+
+.page-item:last-child, .page-item:first-child, .page-link {
+    border-color : #ffc107 !important;
+}
       

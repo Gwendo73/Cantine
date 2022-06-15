@@ -257,10 +257,13 @@ def infosEnfants():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
+        page_size = 3
+        page = int(request.args.get('page', '1'))
         enfants = cur.execute("SELECT E.nom_enfant, E.prenom_enfant, C.nom_classe, T.nom_tarif, R.nom_representant, R.prenom_representant, E.code_enfant FROM Enfant AS E "
         "INNER JOIN Classe AS C ON E.code_classe = C.code_classe INNER JOIN Tarif AS T ON T.code_tarif = E.code_tarif "
         "INNER JOIN Representant AS R ON R.code_representant = E.code_representant ORDER BY E.nom_enfant, E.prenom_enfant").fetchall()
-        return render_template('A_infosEnfants.html', enfants=enfants)
+        page_total = int(len(enfants)/page_size) + 1
+        return render_template('A_infosEnfants.html', enfants=enfants[((page-1) * page_size) : (page * page_size)], list_of_page = range(1, page_total + 1), page_total = page_total, page = page)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
     return redirect(url_for('accueil'))
