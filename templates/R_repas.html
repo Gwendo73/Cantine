@@ -4,7 +4,7 @@
 <head>
     {% extends "R_layout.html" %}
     {% block head %}
-    <title>Restauration scolaire de l'école ...</title>
+    <title>CLG - Repas {{ month }}</title>
     {% endblock %}
 </head>
 
@@ -68,7 +68,7 @@
 
         </table>
         {% endfor %}
-        <a class="btn btn-warning" href="/ajoutRepas">Ajouter un repas</a>
+        <a class="btn btn-warning mb-3" href="/ajoutRepas">Ajouter un repas</a>
     </div>
     {% endblock %}
 </body>

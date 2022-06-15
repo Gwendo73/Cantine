@@ -2,18 +2,18 @@ from main import *
 
 ### ACCEUIL
 
-@app.route('/accueil', methods = ["GET"])
-@login_required
-def accueil():
-    db = get_db()
-    cur = db.cursor()
-    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    if user[0] == 'Representant':
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-        return render_template('R_accueil.html', enfants = enfants)
-    if user[0] == 'Admin':
-        return redirect(url_for('accueilAdmin'))
-    return redirect(url_for('accueilEnseignant'))
+# @app.route('/accueil', methods = ["GET"])
+# @login_required
+# def accueil():
+#     db = get_db()
+#     cur = db.cursor()
+#     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+#     if user[0] == 'Representant':
+#         enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+#         return render_template('R_accueil.html', enfants = enfants)
+#     if user[0] == 'Admin':
+#         return redirect(url_for('accueilAdmin'))
+#     return redirect(url_for('accueilEnseignant'))
 
 ### ACTU 
 
@@ -46,12 +46,13 @@ def ajoutRepas():
             date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
             for enfant in enfants:
                 if request.form.getlist(enfant[1]):
-                    check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date, enfant[0])).fetchone()
-                    if not check and date >= newDate:
+                    check = cur.execute("SELECT * FROM Repas WHERE date_repas = ? AND code_enfant = ? ", (date.strftime('%Y-%m-%d'), enfant[0], )).fetchone()
+                    checkConge = cur.execute("SELECT * FROM Conge WHERE date_conge = ?", (date.strftime('%Y-%m-%d'),)).fetchone()
+                    if not check and date >= newDate and checkConge == None:
                         cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date.strftime('%Y-%m-%d'), enfant[0]))
                         msg = "Repas réservé avec succès"
                     else:
-                        msg = "Le repas n'a pas été réservé car la réservation est trop tardive"
+                        msg = "Le repas n'a pas été réservé car la réservation est trop tardive ou le repas est déjà réservé ou ce jour est en congé"
                 db.commit()
             return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'), msg = msg)
         return render_template('R_ajoutRepas.html', enfants = enfants, now = now.strftime('%Y-%m-%d'))
@@ -141,7 +142,7 @@ def enfant(code_enfant):
             for jour in jours:
                 if request.form.getlist(jour[1]):
                     cur.execute("INSERT INTO Mange VALUES (?,?)", (jour[0], code_enfant, ))
-                    print(formule(jour[0], int(now.year)))
+                    formule(jour[0], int(now.year), code_enfant)
                     i += 1
             if i == 0:
                 i = 5
@@ -408,14 +409,34 @@ def index(mois):
         return 12
     
         
-def formule(idJour, annee):
+def formule(idJour, annee, code_enfant):
+    db = get_db()
+    cur = db.cursor()
+    now = datetime.datetime.today()
+    anneeBis = annee
+    if now.month > 7:
+        anneeBis += 1
+    debut = datetime.datetime(annee, now.month, now.day).strftime('%m/%d/%Y')
+    fin = datetime.datetime(anneeBis, 7, 15).strftime('%m/%d/%Y')
     if idJour == 1:
-        return pd.date_range(start=str(annee - 1), end=str(annee), freq='W-MON').strftime('%Y-%m-%d').tolist()
+        dates = pd.date_range(start=debut, end=fin, freq='W-MON').strftime('%Y-%m-%d').tolist()
     if idJour == 2:
-        return pd.date_range(start=str(annee - 1), end=str(annee), freq='W-TUE').strftime('%Y-%m-%d').tolist()
+        dates = pd.date_range(start=debut, end=fin, freq='W-TUE').strftime('%Y-%m-%d').tolist()
     if idJour == 3:
-        return pd.date_range(start=str(annee - 1), end=str(annee), freq='W-THU').strftime('%Y-%m-%d').tolist()
+        dates = pd.date_range(start=debut, end=fin, freq='W-THU').strftime('%Y-%m-%d').tolist()
     if idJour == 4:
-        return pd.date_range(start=str(annee - 1), end=str(annee), freq='W-FRI').strftime('%Y-%m-%d').tolist()
+        dates = pd.date_range(start=debut, end=fin, freq='W-FRI').strftime('%Y-%m-%d').tolist()
+    conges = cur.execute("SELECT * FROM Conge").fetchall()
+    repas = cur.execute("SELECT date_repas FROM Repas WHERE code_enfant = ?", (code_enfant,)).fetchall()
+    print(dates)
+    for repa in repas:
+        for date in dates:
+            for conge in conges:
+                if date != conge[0] and date != repa[0]:
+                    cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date, code_enfant,))
+                    print(date)  
+                    break
+        break
+    return
 
 

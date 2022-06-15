@@ -4,7 +4,7 @@
 <head>
     {% extends "R_layout.html" %}
     {% block head %}
-    <title>Restauration scolaire de l'école ...</title>
+    <title>CLG - {{enfant[1]}}</title>
     {% endblock %}
 </head>
 
@@ -94,7 +94,8 @@
                     <input class="form-control" type="text" placeholder="1 seule allergie !" name="autre" id="autre">
                 </div>
             </div>
-            <button type="submit" class="btn btn-warning mb-3">Soumettre</button>
+            <button type="submit" class="btn btn-warning mb-3">Valider</button>
+<!-- ajouter un confirm -->
         </form>
     </div>
     {% endblock %}

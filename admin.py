@@ -1,3 +1,4 @@
+from sympy import true
 from main import *
 
 ### ACCEUIL ADMIN
@@ -496,26 +497,32 @@ def suppressionT(code_tarif):
 
 
 
+
+
+
+
+
+
+
+# NOUVEAUTES : Gestion des vacances 
+
+
+
 @app.route('/calendrier', methods=['GET', 'POST'])
 @login_required
 def calendrier():
     db = get_db()
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    
     if user[0] == 'Admin':
-        conges = cur.execute("SELECT * FROM Conge").fetchall()
+        conges = cur.execute("SELECT * FROM Conge ORDER BY date_conge").fetchall()
         return render_template('A_calendrier.html', conges=conges)
-    
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
     return redirect(url_for('accueil'))
 
 
-
-
-
-
+#CREER un range de date de départ à date d'arrivée pour que ça remplisse la base de données avec toutes les dates intermédiaires
 @app.route('/ajoutVacances', methods=['GET', 'POST'])
 @login_required
 def ajoutVacances():
@@ -523,26 +530,43 @@ def ajoutVacances():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
-        
-        # types_classe = cur.execute("SELECT * FROM typedeclasse").fetchall()
-        # classes = cur.execute("SELECT * FROM Classe").fetchall()
-        # if request.method == "POST":
-        #     db = get_db()
-        #     cur = db.cursor()
-        #     cur.execute("INSERT INTO classe(nom_classe, code_type) VALUES (?,?)", 
-        #         (request.form["classe"], request.form["type_classe"], ))
-        #     db.commit()
-        #     return redirect(url_for('infosClasses'))
-        # return render_template('A_ajoutVacances', types_classe = types_classe, classes = classes)
-
         if request.method == "POST":
             db = get_db()
             cur = db.cursor()
-            cur.execute("INSERT INTO conge(nom_tarif, tarif) VALUES (?,?)", 
-                (request.form["date_debut"], request.form["date_fin"], ))
+            continueW = True
+            insert = True
+            new_date = datetime.datetime.strptime(request.form["date_debut"], '%Y-%m-%d')
+            conges = cur.execute("SELECT * FROM Conge").fetchall()
+            while continueW:
+                if new_date.strftime('%Y-%m-%d') == request.form["date_fin"]:
+                    continueW = False
+                for conge in conges:
+                    if new_date.strftime('%Y-%m-%d')  == conge[0]:
+                        insert = False
+                        break
+                if insert:
+                    cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (new_date.strftime('%Y-%m-%d'), )) 
+                    cur.execute("DELETE FROM Repas WHERE date_repas = ?", (new_date.strftime('%Y-%m-%d'), ))
+                insert = True
+                new_date += datetime.timedelta(days = 1)
             db.commit()
-            return redirect(url_for('ajoutVacances'))
+            return redirect(url_for('calendrier'))
         return render_template('A_ajoutVacances.html')
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant')) 
+    return redirect(url_for('accueil'))
+
+
+@app.route('/annuleVacances/<conges>', methods = ["GET"])
+@login_required
+def annuleVacances(conges):
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        cur.execute("DELETE FROM Conge WHERE date_conge = ?", (conges, ))
+        db.commit()
+        return redirect(url_for('calendrier'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant')) 
     return redirect(url_for('accueil'))

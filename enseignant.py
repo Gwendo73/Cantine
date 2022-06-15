@@ -51,13 +51,54 @@ def modifmdp():
 
     
 
-@app.route('/presence')
+@app.route('/presence', defaults={'code_classe': 0},methods = ["POST", "GET"])
+@app.route('/presence/<int:code_classe>', methods = ["POST", "GET"])
 @login_required
-def presence():
+def presence(code_classe):
     db = get_db()
     cur = db.cursor() 
-    now = datetime.datetime.today().strftime('%Y-%m-%d')
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    enfantsm=cur.execute("SELECT E.nom_enfant, E.prenom_enfant FROM Enseigne AS Ens INNER JOIN Enfant AS E ON Ens.code_classe = E.code_classe INNER JOIN Repas AS R ON R.code_enfant = E.code_enfant WHERE R.date_repas = ? ", (request.form("dates"),)).fetchall()
-    classes=cur.execute("SELECT C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe=C.code_classe WHERE  E.code_enseigant=?").fetchall()
+    if user[0] == 'Enseignant':
+        allergies = []
+        now = datetime.datetime.today().strftime('%Y-%m-%d')
+        user = cur.execute("SELECT code_enseignant FROM Enseignant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+        classes = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ?", (user[0],)).fetchall()
+        print(code_classe)
+        if code_classe == 0:
+            code = classes[0][0]
+        else:
+            code = code_classe
+        enfants = cur.execute("SELECT E.nom_enfant, E.prenom_enfant, E.code_enfant, Rep.telephone, R.code_repas FROM Enseigne AS Ens INNER JOIN Enfant AS E ON Ens.code_classe = E.code_classe INNER JOIN Repas AS R ON R.code_enfant = E.code_enfant INNER JOIN Representant AS Rep ON Rep.code_representant = E.code_representant WHERE R.date_repas = ? AND E.code_classe = ?", (now, code, )).fetchall()
+        classeActuelle = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ? AND C.code_classe = ?", (user[0], code, )).fetchone()
+        for enfant in enfants:
+            allergies.append(cur.execute("SELECT Al.nom_allergie, A.code_enfant FROM EstAllergiqueA AS A INNER JOIN Allergie AS Al ON Al.code_allergie = A.code_allergie WHERE A.code_enfant = ?", (enfant[2], )).fetchall())
+        if request.method == "POST":
+            allergies = []
+            now = request.form["calendar"]
+            classes = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ?", (user[0], )).fetchall()
+            classeActuelle = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ? AND C.code_classe = ?", (user[0], request.form["classe"], )).fetchone()
+            enfants = cur.execute("SELECT E.nom_enfant, E.prenom_enfant, E.code_enfant, Rep.telephone, R.code_repas FROM Enseigne AS Ens INNER JOIN Enfant AS E ON Ens.code_classe = E.code_classe INNER JOIN Repas AS R ON R.code_enfant = E.code_enfant INNER JOIN Representant AS Rep ON Rep.code_representant=E.code_representant WHERE R.date_repas = ? AND E.code_classe = ? ORDER BY nom_enfant, prenom_enfant ", (now, classeActuelle[0])).fetchall()           
+            for enfant in enfants:
+                allergies.append(cur.execute("SELECT Al.nom_allergie, A.code_enfant FROM EstAllergiqueA AS A INNER JOIN Allergie AS Al ON Al.code_allergie = A.code_allergie WHERE A.code_enfant = ?", (enfant[2], )).fetchall())
+            print(allergies)
+        return render_template("E_presence.html", classes = classes, enfants = enfants, now = now, allergiesEnfants = allergies, classeActuelle = classeActuelle)
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
     return redirect(url_for('accueil'))
+
+@app.route('/supprRepas/<int:code_repas>', methods=["GET"])
+@login_required
+def supprRepas(code_repas):
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Enseignant':
+        classe = cur.execute("SELECT E.code_classe FROM Enfant AS E INNER JOIN Repas AS R ON R.code_enfant = E.code_enfant WHERE R.code_repas = ?", (code_repas, )).fetchone()
+        cur.execute("DELETE FROM Repas WHERE code_repas = ?", (code_repas, ))
+        db.commit()
+        print(classe)
+        return redirect(url_for('presence', code_classe = classe[0]))
+    if user[0] == 'Admin':
+        return redirect(url_for('accueilAdmin'))
+    return redirect(url_for('accueil'))
+    

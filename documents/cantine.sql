@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS EstAllergiqueA (
   FOREIGN KEY (code_enfant) REFERENCES Enfant(code_enfant)
 );
 
--- --------------------------------------------------------
+----------------------------------------------------------
 
 --
 -- Structure de la table `Conge`
@@ -227,19 +227,21 @@ CREATE TABLE IF NOT EXISTS Conge (
   date_conge date PRIMARY KEY
 );
 
--- --------------------------------------------------------
+----------------------------------------------------------
 
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
 INSERT INTO Compte VALUES ('gartalle', 'test', 'Representant');
 INSERT INTO Compte VALUES ('clem', 'test', 'Representant');
 INSERT INTO Compte VALUES ('churson', 'churson', 'Representant');
 INSERT INTO Compte VALUES ('ajacquemin', 'test', 'Enseignant');
+INSERT INTO Compte VALUES ('jneymar', 'jneymar', 'Enseignant');
 
 INSERT INTO Enseignant VALUES (1, 'JACQUEMIN', 'Alexis', 'ajacquemin');
+INSERT INTO Enseignant VALUES (2, 'NEYMAR', 'Jean', 'jneymar');
 
 INSERT INTO Representant VALUES (1, 'ARTALLE', 'Gwendal', '0647396010', 'gwendal.artalle73@gmail.com', 'gartalle');
 INSERT INTO Representant VALUES (2, 'PHILIPPE', 'Clementine', '0655108310', 'clemclem@gmail.com', 'clem');
-INSERT INTO Representant VALUES (3, 'HURSON', 'Cesar', '', '', 'churson');
+INSERT INTO Representant VALUES (3, 'HURSON', 'Cesar', '0625408670', 'cesar.hurson@dgac.fr', 'churson');
 
 INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
 INSERT INTO Tarif VALUES (2, 'Tarif CAF', 2.8);
@@ -254,9 +256,14 @@ INSERT INTO TypeDeClasse VALUES (6, 'Primaire', 'CE2');
 INSERT INTO TypeDeClasse VALUES (7, 'Primaire', 'CM1');
 INSERT INTO TypeDeClasse VALUES (8, 'Primaire', 'CM2');
 
-INSERT INTO Classe VALUES (1, 'CP', 4);
-INSERT INTO Classe VALUES (2, 'CE1', 5);
-INSERT INTO Classe VALUES (3, 'CE2', 6);
+INSERT INTO Classe VALUES (1, 'PS', 1);
+INSERT INTO Classe VALUES (2, 'MS', 2);
+INSERT INTO Classe VALUES (3, 'GS', 3);
+INSERT INTO Classe VALUES (4, 'CP', 4);
+INSERT INTO Classe VALUES (5, 'CE1', 5);
+INSERT INTO Classe VALUES (6, 'CE2', 6);
+INSERT INTO Classe VALUES (7, 'CM1', 7);
+INSERT INTO Classe VALUES (8, 'CM2', 8);
 
 INSERT INTO Formule VALUES (1, '1J');
 INSERT INTO Formule VALUES (2, '2J');
