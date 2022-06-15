@@ -20,7 +20,7 @@ def accueilAdmin():
         return render_template('A_accueilAdmin.html')
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### AJOUT ENFANT
 
@@ -45,7 +45,7 @@ def ajouterEnfant(code_rep):
         return render_template('A_ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs, formules = formules)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil')) 
+    return redirect(url_for('accueil')) 
 
 ### COMPTES
 
@@ -74,7 +74,7 @@ def comptes():
         return render_template('A_comptes.html')
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### CREATION CLASSE
 
@@ -97,7 +97,7 @@ def creerClasse():
         return render_template('A_creerClasse.html', types_classe = types_classe, classes = classes)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### CREATION TARIF 
 
@@ -120,7 +120,7 @@ def creerTarif():
         return render_template('A_creerTarif.html')
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### DETAILS CLASSE
 
@@ -142,7 +142,7 @@ def detailsClasse(code_classe):
         return render_template('A_detailsClasse.html', enseignants = enseignants, enfants = enfants, classe = classe, types = types)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### DETAILS ENFANT 
 
@@ -166,7 +166,7 @@ def detailsEnfant(code_enf):
         return render_template('A_detailsEnfant.html', enfant = enfant, tarifs = tarifs, formules = formules, classes = classes)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### DETAILS ENSEIGNANT
 
@@ -189,7 +189,7 @@ def detailsEnseignant(code_ens):
         return render_template('A_detailsEnseignant.html', enseignant = enseignant, classes = classes)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### DETAILS FAMILLE
 
@@ -210,7 +210,7 @@ def detailsFamille(code_rep):
         return render_template('A_detailsFamille.html', representant = representant, enfants = enfants)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### DETAILS TARIF
 
@@ -230,7 +230,7 @@ def detailsTarif(code_tarif):
         return render_template('A_detailsTarif.html', enfants = enfants, tarif = tarif)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### INFOS CLASSES
 
@@ -245,7 +245,7 @@ def infosClasses():
         return render_template('A_infosClasses.html', classes=classes)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### INFOS ENFANTS
 
@@ -262,7 +262,7 @@ def infosEnfants():
         return render_template('A_infosEnfants.html', enfants=enfants)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ###  INFOS ENSEIGNANTS
 
@@ -277,7 +277,7 @@ def infosEnseignants():
         return render_template('A_infosEnseignants.html', enseignants=enseignants)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### INFOS FAMILLE
 
@@ -292,7 +292,7 @@ def infosFamille():
         return render_template('A_infosFamilles.html', representants=representants)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### INFOS TARIFS
 
@@ -307,7 +307,7 @@ def infosTarifs():
         return render_template('A_infosTarifs.html', tarifs=tarifs)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### LIAISON CLASSE
 
@@ -331,7 +331,7 @@ def lierClasse(code_ens):
         return render_template('A_lierClasse.html', enseignant = enseignant, classes = classes, enseignes = enseignes)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### LIAISON ENSEIGNANT
 
@@ -356,7 +356,7 @@ def lierEnseignant(code_classe):
         return render_template('A_lierEnseignant.html', enseignants = enseignants, classe = classe, enseignes = enseignes)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### MODIFICATION MDP ENSEIGNANT
 
@@ -374,7 +374,7 @@ def modifMDPE(code_ens):
         return redirect(url_for('detailsEnseignant', code_ens = code_ens))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### MODIFICATION MDP REPRESENTANT
 
@@ -392,7 +392,7 @@ def modifMDPR(code_rep):
         return redirect(url_for('detailsFamille', code_rep = code_rep))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### SUPPRESSION CLASSE
 
@@ -411,7 +411,7 @@ def suppressionC(code_classe):
         return redirect(url_for('infosClasses'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### SUPPRESSION ENFANT
 
@@ -428,7 +428,7 @@ def suppressionE(code_enf):
         return redirect(url_for('detailsFamille', code_rep = code[0]))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### SUPPRESSION ENSEIGNANT
 
@@ -447,7 +447,7 @@ def suppressionEns(code_ens):
         return redirect(url_for('infosEnseignants'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### SUPPRESSION REPRESENTANT
 
@@ -466,7 +466,7 @@ def suppressionR(code_rep):
         return redirect(url_for('infosFamilles'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
 
 ### SUPPRESSION TARIF
 
@@ -484,4 +484,65 @@ def suppressionT(code_tarif):
         return redirect(url_for('infosTarifs'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return render_template(url_for('accueil'))
+    return redirect(url_for('accueil'))
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/calendrier', methods=['GET', 'POST'])
+@login_required
+def calendrier():
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    
+    if user[0] == 'Admin':
+        conges = cur.execute("SELECT * FROM Conge").fetchall()
+        return render_template('A_calendrier.html', conges=conges)
+    
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return redirect(url_for('accueil'))
+
+
+
+
+
+
+@app.route('/ajoutVacances', methods=['GET', 'POST'])
+@login_required
+def ajoutVacances():
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        
+        # types_classe = cur.execute("SELECT * FROM typedeclasse").fetchall()
+        # classes = cur.execute("SELECT * FROM Classe").fetchall()
+        # if request.method == "POST":
+        #     db = get_db()
+        #     cur = db.cursor()
+        #     cur.execute("INSERT INTO classe(nom_classe, code_type) VALUES (?,?)", 
+        #         (request.form["classe"], request.form["type_classe"], ))
+        #     db.commit()
+        #     return redirect(url_for('infosClasses'))
+        # return render_template('A_ajoutVacances', types_classe = types_classe, classes = classes)
+
+        if request.method == "POST":
+            db = get_db()
+            cur = db.cursor()
+            cur.execute("INSERT INTO conge(nom_tarif, tarif) VALUES (?,?)", 
+                (request.form["date_debut"], request.form["date_fin"], ))
+            db.commit()
+            return redirect(url_for('ajoutVacances'))
+        return render_template('A_ajoutVacances.html')
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant')) 
+    return redirect(url_for('accueil'))

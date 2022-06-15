@@ -26,6 +26,7 @@ DROP TABLE Jour;
 DROP TABLE Mange;
 DROP TABLE EstAllergiqueA;
 DROP TABLE Allergie;
+DROP TABLE Conge;
 --
 -- Base de données : `cantine`
 --
@@ -216,6 +217,17 @@ CREATE TABLE IF NOT EXISTS EstAllergiqueA (
   FOREIGN KEY (code_enfant) REFERENCES Enfant(code_enfant)
 );
 
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `Conge`
+--
+
+CREATE TABLE IF NOT EXISTS Conge (
+  date_conge date PRIMARY KEY
+);
+
+-- --------------------------------------------------------
 
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
 INSERT INTO Compte VALUES ('gartalle', 'test', 'Representant');
@@ -281,3 +293,5 @@ INSERT INTO Allergie VALUES (5, 'Oeufs');
 INSERT INTO Allergie VALUES (6, 'Fruits');
 
 INSERT INTO EstAllergiqueA VALUES (1, 1);
+
+INSERT INTO Conge VALUES ('2022-06-23')

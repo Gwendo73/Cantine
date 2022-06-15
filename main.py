@@ -4,6 +4,7 @@ import flask_login
 from flask_bcrypt import Bcrypt
 import sqlite3
 import datetime
+import pandas as pd
 
 # INITIALISATION
 app = Flask(__name__)
