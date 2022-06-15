@@ -13,16 +13,16 @@
     {% block content %}
     <form method="POST">
         <div class="container mt-3">
-        <h1>Eleves mangeant à la cantine le {{ now }} dans la classe de {{ classeActuelle[1] }}</h1> 
+            <h1>Eleves mangeant à la cantine le {{ now }} dans la classe de {{ classeActuelle[1] }}</h1>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="classe">Classe</label>
                 <div class="col-sm-10">
                     <select name="classe" class="form-control" id="classe">
                         {% for classe in classes %}
                         {% if classeActuelle[0] == classe[0] %}
-                            <option value="{{ classe[0] }}" selected>{{ classe [1] }}</option>
+                        <option value="{{ classe[0] }}" selected>{{ classe [1] }}</option>
                         {% else %}
-                            <option value="{{ classe[0] }}">{{ classe [1] }}</option>
+                        <option value="{{ classe[0] }}">{{ classe [1] }}</option>
                         {% endif %}
                         {% endfor %}
                     </select>
@@ -38,6 +38,9 @@
                 </div>
             </div>
             <button class="btn btn-warning">Valider</button>
+            <a href="/supprAll/{{ classeActuelle[0] }}/{{ now }}" class="btn btn-warning"
+                onclick="if (confirm('Voulez-vous vraiment supprimer tous les repas de la classe?')) commentDelete(1); return false">
+                Tout annuler</a>
         </div>
 
         <div class="container">
@@ -58,20 +61,23 @@
                         <td>{{enfant[0]}}</td>
                         <td>{{enfant[1]}}</td>
                         <td>
-                        {% for allergies in allergiesEnfants%}
-                        {% for allergie in allergies %}
+                            {% for allergies in allergiesEnfants%}
+                            {% for allergie in allergies %}
                             {% if allergie[1] == enfant[2]%}
                             {{ allergie[0] }}
                             {% endif %}
-                        {% endfor %}
-                        {% endfor %}
+                            {% endfor %}
+                            {% endfor %}
                         </td>
                         <td>{{enfant[3]}}</td>
-                        <td><a href="/supprRepas/{{ enfant[4] }}" class="btn btn-warning" onclick="if (confirm('Voulez-vous vraiment supprimer ce repas ?')) commentDelete(1); return false">Supprimer</a></td>
+                        <td><a href="/supprRepas/{{ enfant[4] }}" class="btn btn-warning"
+                                onclick="if (confirm('Voulez-vous vraiment supprimer ce repas ?')) commentDelete(1); return false">Supprimer</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+
         </div>
 
     </form>

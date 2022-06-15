@@ -54,7 +54,7 @@ def ajoutRepas():
                         msg = "Repas réservé avec succès"
                     if check:
                         msg = "Le repas est déjà réservé"
-                    if date >= newDate:
+                    if date < newDate:
                         msg = "La date de réservation est de moins de 48h"
                     if checkConge:
                         msg = "Il n'y a pas école ce jour là"
