@@ -292,8 +292,11 @@ def infosFamille():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
+        page_size = 3
+        page = int(request.args.get('page', '1'))
         representants = cur.execute("SELECT * FROM Representant ORDER BY nom_representant, prenom_representant").fetchall()
-        return render_template('A_infosFamilles.html', representants=representants)
+        page_total = int(len(representants)/page_size) + 1
+        return render_template('A_infosFamilles.html', representants=representants[((page-1) * page_size) : (page * page_size)], list_of_page = range(1, page_total + 1), page_total = page_total, page = page)
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
     return redirect(url_for('accueil'))

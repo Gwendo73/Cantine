@@ -36,6 +36,34 @@
                 {% endfor %}
             </tbody>
         </table>
+
+
+       <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          {% if page > 1 %}
+          <li class="page-item">
+            <a class="page-link link-warning" href="/infosFamilles?page={{ page - 1 }}">Previous</a>
+        </li>
+        {% endif %}
+        {% for page_number in list_of_page %}
+        {% if page_number == page %}
+        <li class="page-item active">
+            <a class="page-link link-warning" href="/infosFamilles?page={{ page_number }}">{{ page_number }}</a>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link link-warning" href="/infosFamilles?page={{ page_number }}">{{ page_number }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        {% if page < page_total %} 
+        <li class="page-item">
+            
+            <a class="page-link link-warning" href="/infosFamilles?page={{ page + 1 }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
     </div>
     {% endblock %}
 </body>
