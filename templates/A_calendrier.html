@@ -22,13 +22,15 @@
                 </tr>
             </thead>
             <tbody>
+                {% set i = namespace (index = 0) %}
                 {% for conge in conges %}
                 <tr>
-                    <td>{{ conge[0] }}</td>
+                    <td>{{ date[i.index] }}</td>
                     <td><a class="btn btn-warning" href="/annuleVacances/{{ conge[0] }}"
                         onclick="if (confirm('Voulez-vous vraiment annuler le jour de congés ?')) commentDelete(1); return false">Annuler</a>
                     </td>
                 </tr>
+                {% set i.index = i.index + 1 %}
                 {% endfor %}
             </tbody>
         </table>

@@ -5,6 +5,10 @@ from flask_bcrypt import Bcrypt
 import sqlite3
 import datetime
 import pandas as pd
+import locale
+
+
+locale.setlocale(locale.LC_ALL, 'fr_FR')
 
 # INITIALISATION
 app = Flask(__name__)

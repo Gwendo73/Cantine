@@ -36,10 +36,11 @@
                     </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-warning">Valider</button>
+            <button type="submit" class="btn btn-warning mb-3">Valider</button>
+            <a class="btn btn-warning mb-3" href="/ajoutRepas">Ajouter un repas</a>
         </form>
         <p>/!\ Les repas peuvent être annulés au plus tard 48h avant celui-ci /!\</p>
-        <p>Annulation possible à partir du {{date_limite}}</p>
+        <p>Annulation possible à partir du {{ date_limite }}</p>
         {% for enfant in enfants %}
         <h2>{{ enfant[2] }} {{ enfant[1] }}</h2>
         <table class="table table-stripped">
@@ -48,19 +49,23 @@
                 <th cope="col">Action</th>
             </thead>
             <tbody>
+                {% set i = namespace (index = 0) %}
                 {% for repas in repasEnfants %}
                 {% for repa in repas %}
                 {% if repa[0] %}
                 {% if repa[2] == enfant[0] %}
                 <tr>
-                    <td scope="row">{{ repa[1] }}</td>
-                    {% if repa[1] >= date_limite %}
+                    <!-- dateInter[i.index] -->
+                    <td scope="row">{{ dateInter[i.index] }}</td>
+                    {% if repa[1] >= date_annulation %}
                     <td><a class="btn btn-warning" href="/annuleRepas/{{ repa[0] }}"
                             onclick="if (confirm('Voulez-vous vraiment annuler le repas ?')) commentDelete(1); return false">Annuler</a>
                     </td>
                     {% endif %}
                 </tr>
+                
                 {% endif %}
+                {% set i.index = i.index + 1 %}
                 {% endif %}
                 {% endfor %}
                 {% endfor %}
@@ -68,7 +73,7 @@
 
         </table>
         {% endfor %}
-        <a class="btn btn-warning mb-3" href="/ajoutRepas">Ajouter un repas</a>
+        
     </div>
     {% endblock %}
 </body>

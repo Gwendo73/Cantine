@@ -48,6 +48,75 @@ def ajouterEnfant(code_rep):
         return redirect(url_for('accueilEnseignant'))
     return redirect(url_for('accueil')) 
 
+### AJOUT VACANCES
+
+@app.route('/ajoutVacances', methods=['GET', 'POST'])
+@login_required
+def ajoutVacances():
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        if request.method == "POST":
+            db = get_db()
+            cur = db.cursor()
+            continueW = True
+            insert = True
+            new_date = datetime.datetime.strptime(request.form["date_debut"], '%Y-%m-%d')
+            conges = cur.execute("SELECT * FROM Conge").fetchall()
+            while continueW:
+                if new_date.strftime('%Y-%m-%d') == request.form["date_fin"]:
+                    continueW = False
+                for conge in conges:
+                    if new_date.strftime('%Y-%m-%d')  == conge[0]:
+                        insert = False
+                        break
+                if insert:
+                    cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (new_date.strftime('%Y-%m-%d'), )) 
+                    cur.execute("DELETE FROM Repas WHERE date_repas = ?", (new_date.strftime('%Y-%m-%d'), ))
+                insert = True
+                new_date += datetime.timedelta(days = 1)
+            db.commit()
+            return redirect(url_for('calendrier'))
+        return render_template('A_ajoutVacances.html')
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant')) 
+    return redirect(url_for('accueil'))
+
+### ANNULE VACANCES
+
+@app.route('/annuleVacances/<conges>', methods = ["GET"])
+@login_required
+def annuleVacances(conges):
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        cur.execute("DELETE FROM Conge WHERE date_conge = ?", (conges, ))
+        db.commit()
+        return redirect(url_for('calendrier'))
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant')) 
+    return redirect(url_for('accueil'))
+
+### CALENDRIER
+
+@app.route('/calendrier', methods=['GET', 'POST'])
+@login_required
+def calendrier():
+    db = get_db()
+    cur = db.cursor()
+    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
+    if user[0] == 'Admin':
+        conges = cur.execute("SELECT * FROM Conge ORDER BY date_conge").fetchall()
+        date = []
+        for conge in conges:
+            date.append(datetime.datetime.strptime(conge[0], '%Y-%m-%d').strftime('%A %d/%m/%Y'))
+        return render_template('A_calendrier.html', conges = conges, date = date)
+    if user[0] == 'Enseignant':
+        return redirect(url_for('accueilEnseignant'))
+    return redirect(url_for('accueil'))
+
 ### COMPTES
 
 @app.route('/comptes', methods = ["POST", "GET"])
@@ -491,88 +560,4 @@ def suppressionT(code_tarif):
         return redirect(url_for('infosTarifs'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
-    return redirect(url_for('accueil'))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# NOUVEAUTES : Gestion des vacances 
-
-
-
-@app.route('/calendrier', methods=['GET', 'POST'])
-@login_required
-def calendrier():
-    db = get_db()
-    cur = db.cursor()
-    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    if user[0] == 'Admin':
-        conges = cur.execute("SELECT * FROM Conge ORDER BY date_conge").fetchall()
-        return render_template('A_calendrier.html', conges=conges)
-    if user[0] == 'Enseignant':
-        return redirect(url_for('accueilEnseignant'))
-    return redirect(url_for('accueil'))
-
-
-#CREER un range de date de départ à date d'arrivée pour que ça remplisse la base de données avec toutes les dates intermédiaires
-@app.route('/ajoutVacances', methods=['GET', 'POST'])
-@login_required
-def ajoutVacances():
-    db = get_db()
-    cur = db.cursor()
-    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    if user[0] == 'Admin':
-        if request.method == "POST":
-            db = get_db()
-            cur = db.cursor()
-            continueW = True
-            insert = True
-            new_date = datetime.datetime.strptime(request.form["date_debut"], '%Y-%m-%d')
-            conges = cur.execute("SELECT * FROM Conge").fetchall()
-            while continueW:
-                if new_date.strftime('%Y-%m-%d') == request.form["date_fin"]:
-                    continueW = False
-                for conge in conges:
-                    if new_date.strftime('%Y-%m-%d')  == conge[0]:
-                        insert = False
-                        break
-                if insert:
-                    cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (new_date.strftime('%Y-%m-%d'), )) 
-                    cur.execute("DELETE FROM Repas WHERE date_repas = ?", (new_date.strftime('%Y-%m-%d'), ))
-                insert = True
-                new_date += datetime.timedelta(days = 1)
-            db.commit()
-            return redirect(url_for('calendrier'))
-        return render_template('A_ajoutVacances.html')
-    if user[0] == 'Enseignant':
-        return redirect(url_for('accueilEnseignant')) 
-    return redirect(url_for('accueil'))
-
-
-@app.route('/annuleVacances/<conges>', methods = ["GET"])
-@login_required
-def annuleVacances(conges):
-    db = get_db()
-    cur = db.cursor()
-    user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-    if user[0] == 'Admin':
-        cur.execute("DELETE FROM Conge WHERE date_conge = ?", (conges, ))
-        db.commit()
-        return redirect(url_for('calendrier'))
-    if user[0] == 'Enseignant':
-        return redirect(url_for('accueilEnseignant')) 
     return redirect(url_for('accueil'))

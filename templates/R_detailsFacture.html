@@ -26,12 +26,14 @@
             </thead>
             <tbody>
                 {% set pr = namespace (prixTotal = 0) %}
+                {% set i = namespace (index = 0) %}
                 {% for repa in repas %}
                 <tr>
-                    <td scope="row">{{ repa[0] }}</td>
+                    <td scope="row">{{ dateInter[i.index] }}</td>
                     <td>{{ repa[1] }}</td>
                     <td>{{ repa[2] }}€</td>
                 </tr>
+                {% set i.index = i.index + 1 %}
                 {% set pr.prixTotal = pr.prixTotal + repa[2] %}
                 {% endfor %}
                 <tr>

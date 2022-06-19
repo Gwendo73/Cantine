@@ -61,6 +61,7 @@ def presence(code_classe):
     if user[0] == 'Enseignant':
         allergies = []
         now = datetime.datetime.today().strftime('%Y-%m-%d')
+        nowJolie = datetime.datetime.today().strftime('%A %d %B')
         user = cur.execute("SELECT code_enseignant FROM Enseignant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
         classes = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ?", (user[0],)).fetchall()
         if code_classe == 0:
@@ -74,13 +75,14 @@ def presence(code_classe):
         if request.method == "POST":
             allergies = []
             now = request.form["calendar"]
+            nowJolie = datetime.datetime.strptime(request.form["calendar"], '%Y-%m-%d').strftime('%A %d %B')
             classes = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ?", (user[0], )).fetchall()
             classeActuelle = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ? AND C.code_classe = ?", (user[0], request.form["classe"], )).fetchone()
             enfants = cur.execute("SELECT E.nom_enfant, E.prenom_enfant, E.code_enfant, Rep.telephone, R.code_repas FROM Enseigne AS Ens INNER JOIN Enfant AS E ON Ens.code_classe = E.code_classe INNER JOIN Repas AS R ON R.code_enfant = E.code_enfant INNER JOIN Representant AS Rep ON Rep.code_representant=E.code_representant WHERE R.date_repas = ? AND E.code_classe = ? ORDER BY nom_enfant, prenom_enfant ", (now, classeActuelle[0])).fetchall()           
             for enfant in enfants:
                 allergies.append(cur.execute("SELECT Al.nom_allergie, A.code_enfant FROM EstAllergiqueA AS A INNER JOIN Allergie AS Al ON Al.code_allergie = A.code_allergie WHERE A.code_enfant = ?", (enfant[2], )).fetchall())
         print(enfants)
-        return render_template("E_presence.html", classes = classes, enfants = enfants, now = now, allergiesEnfants = allergies, classeActuelle = classeActuelle)
+        return render_template("E_presence.html", classes = classes, enfants = enfants, now = now, allergiesEnfants = allergies, classeActuelle = classeActuelle, nowJolie = nowJolie)
     if user[0] == 'Admin':
         return redirect(url_for('accueilAdmin'))
     return redirect(url_for('accueil'))
