@@ -40,7 +40,7 @@ def ajouterEnfant(code_rep):
             db = get_db()
             cur = db.cursor()
             cur.execute("INSERT INTO Enfant(nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant, code_formule) VALUES (?,?,?,?,?,?)", 
-                (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], code_rep, 1, ))
+                (request.form["surname"], request.form["name"], request.form["tarif"], request.form["classe"], code_rep, 5, ))
             db.commit()
             return redirect(url_for('detailsFamille', code_rep = request.form["code"]))
         return render_template('A_ajouterEnfant.html', representant = representant, classes = classes, tarifs = tarifs, formules = formules)
