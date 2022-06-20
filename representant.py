@@ -1,3 +1,4 @@
+from sqlite3 import DataError
 from main import *
 
 ### ACTU 
@@ -24,7 +25,7 @@ def ajoutRepas():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
-        now = datetime.datetime.today()
+        now = choixDate()
         newDate = now + datetime.timedelta(days = 2)
         enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         if request.method == "POST":
@@ -77,15 +78,15 @@ def detailsFacture(code_mois):
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
-        now = datetime.datetime.today().strftime('%d/%m/%Y')
+        now = choixDate().strftime('%d/%m/%Y')
         if code_mois < 10:
             code_mois = '0' + str(code_mois)
         else:
             code_mois = str(code_mois)
         if int(code_mois) < 13 and int(code_mois) > 7:
-            year = str(datetime.datetime.today().year - 1)
+            year = str(choixDate().year - 1)
         else:
-            year = str(datetime.datetime.today().year)
+            year = str(choixDate().year)
         repas = cur.execute("SELECT R.date_repas, E.prenom_enfant, T.tarif FROM Repas AS R INNER JOIN Enfant AS E ON R.code_enfant = E.code_enfant "
         "INNER JOIN Representant AS Re ON Re.code_representant = E.code_representant INNER JOIN Tarif AS T ON E.code_tarif = T.code_tarif " 
         "WHERE Re.identifiant = ? AND strftime('%m', date_repas) = ? AND strftime('%Y', date_repas) = ? ORDER BY E.code_enfant, R.date_repas", (flask_login.current_user.name, code_mois, year, )).fetchall()
@@ -117,7 +118,7 @@ def enfant(code_enfant):
         jours = cur.execute("SELECT * FROM Jour").fetchall()
         allergies = cur.execute("SELECT * FROM Allergie").fetchall()
         allergiques = cur.execute("SELECT code_allergie FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, )).fetchall()
-        now = datetime.datetime.today()
+        now = choixDate()
         if request.method == "POST":
             cur.execute("DELETE FROM Mange WHERE code_enfant = ?", (code_enfant, ))
             cur.execute("DELETE FROM EstAllergiqueA WHERE code_enfant = ?", (code_enfant, ))
@@ -154,9 +155,9 @@ def facture():
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
         months = ["Aout","Septembre","Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
-        year = datetime.datetime.today().year
+        year = choixDate().year
         year1 = year - 1
-        mois = datetime.datetime.today().month
+        mois = choixDate().month
         enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         if request.method == "POST":
             return redirect(url_for('detailsFacture', code_mois = request.form["facture"]))
@@ -300,10 +301,10 @@ def repas():
         code_rep = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
         enfants = cur.execute("SELECT code_enfant, prenom_enfant, nom_enfant FROM Enfant WHERE code_representant = ? ORDER BY prenom_enfant", (code_rep[0], )).fetchall()
         repas = []
-        year = datetime.datetime.today().year
+        year = choixDate().year
         year1 = year - 1
-        mois = datetime.datetime.today().month
-        now = datetime.datetime.today()
+        mois = choixDate().month
+        now = choixDate()
         months = listeMois(mois)
         new_dateB = datetime.datetime(year, int(now.month), now.day)
         lastDay = last_day_of_month(new_dateB)
@@ -313,9 +314,9 @@ def repas():
         if request.method == "POST":
             code_mois = index(request.form["repas"])
             if code_mois < 13 and code_mois > 7:
-                year = int(datetime.datetime.today().year - 1)
+                year = int(choixDate().year - 1)
             else:
-                year = int(datetime.datetime.today().year)
+                year = int(choixDate().year)
             if request.form["repas"] == months[0]:
                 day = now.day
             else:
@@ -340,7 +341,7 @@ def repas():
 def formule(idJour, annee, code_enfant):
     db = get_db()
     cur = db.cursor()
-    now = datetime.datetime.today()
+    now = choixDate()
     anneeBis = annee
     if now.month > 7:
         anneeBis += 1
@@ -436,3 +437,5 @@ def listeMois(mois):
     if mois == 12:
         months = ["Décembre","Janvier","Février","Mars","Avril","Mai","Juin","Juillet"]
     return months
+
+

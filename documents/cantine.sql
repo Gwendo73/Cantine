@@ -229,9 +229,10 @@ CREATE TABLE IF NOT EXISTS Conge (
 
 ----------------------------------------------------------
 
+-- Compte Admin
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
 
-
+-- Comptes Représentants
 INSERT INTO Compte VALUES ('gartalle', 'database', 'Representant');
 INSERT INTO Compte VALUES ('smic', 'smic', 'Representant');
 INSERT INTO Compte VALUES ('Z', 'Z', 'Representant');
@@ -261,6 +262,7 @@ INSERT INTO Compte VALUES ('mtellier', 'mtellier', 'Representant');
 INSERT INTO Compte VALUES ('mtesta', 'mtesta', 'Representant');
 INSERT INTO Compte VALUES ('gendarme', 'gendarme', 'Representant');
 
+-- Comptes Enseignants
 INSERT INTO Compte VALUES ('jkan', 'jkan', 'Enseignant');
 INSERT INTO Compte VALUES ('jneymar', 'jneymar', 'Enseignant');
 INSERT INTO Compte VALUES ('sdi', 'sdi', 'Enseignant');
@@ -312,8 +314,6 @@ INSERT INTO Representant VALUES (26, 'TELLIER', 'Sylvie', '', '', 'mtellier');
 INSERT INTO Representant VALUES (27, 'TESTARODE', 'Mathieu', '', '', 'mtesta');
 INSERT INTO Representant VALUES (28, 'ZAMPIN', 'Piero', '', '', 'gendarme');
 
-
-
 INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
 INSERT INTO Tarif VALUES (2, 'Tarif CAF', 2.8);
 INSERT INTO Tarif VALUES (3, 'Tarif DGAC', 0.01);
@@ -347,11 +347,6 @@ INSERT INTO Jour VALUES (2, 'Mardi');
 INSERT INTO Jour VALUES (3, 'Jeudi');
 INSERT INTO Jour VALUES (4, 'Vendredi');
 
-
--- code_tarif integer NOT NULL,
---   code_classe integer NOT NULL,
---   code_representant integer NOT NULL,
---   code_formule integer NOT NULL,
 INSERT INTO Enfant VALUES (1, 'ARTALLE', 'Pierre', 1, 1, 1, 1);
 INSERT INTO Enfant VALUES (2, 'ARTALLE', 'Paul', 1, 1, 1, 1);
 INSERT INTO Enfant VALUES (3, 'ARTALLE', 'Jacques', 1, 1, 1, 2);
@@ -384,7 +379,6 @@ INSERT INTO Enseigne VALUES (5, 5);
 INSERT INTO Enseigne VALUES (6, 6);
 INSERT INTO Enseigne VALUES (7, 7);
 INSERT INTO Enseigne VALUES (8, 8);
-
 
 INSERT INTO Allergie VALUES (1, 'Gluten');
 INSERT INTO Allergie VALUES (2, 'Arachides');

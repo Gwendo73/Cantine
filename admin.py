@@ -110,7 +110,7 @@ def calendrier():
     if user[0] == 'Admin':
         page_size = 10
         page = int(request.args.get('page', '1'))
-        now = datetime.datetime.today().strftime('%Y-%m-%d')
+        now = choixDate().strftime('%Y-%m-%d')
         conges = cur.execute("SELECT * FROM Conge WHERE date_conge >= ? ORDER BY date_conge", (now, )).fetchall()
         date = []
         for conge in conges:

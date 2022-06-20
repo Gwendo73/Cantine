@@ -60,8 +60,8 @@ def presence(code_classe):
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Enseignant':
         allergies = []
-        now = datetime.datetime.today().strftime('%Y-%m-%d')
-        nowJolie = datetime.datetime.today().strftime('%A %d %B')
+        now = choixDate().strftime('%Y-%m-%d')
+        nowJolie = choixDate().strftime('%A %d %B')
         user = cur.execute("SELECT code_enseignant FROM Enseignant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
         classes = cur.execute("SELECT C.code_classe, C.nom_classe FROM Classe AS C INNER JOIN Enseigne AS E ON E.code_classe = C.code_classe WHERE E.code_enseignant = ?", (user[0],)).fetchall()
         if code_classe == 0:

@@ -54,6 +54,7 @@ def close_connection(exception):
         
 @app.route('/', methods = ["POST", "GET"])
 def connexion():
+    # Permet de chiffrer les mots de passe à la première création de la base de données.
     # db = get_db()
     # cur = db.cursor()
     # users = cur.execute("SELECT * FROM Compte").fetchall()
@@ -90,6 +91,13 @@ def connexion():
 def deconnexion():
     logout_user()
     return render_template('G_deconnexion.html')
+
+### Fonction permettant de changer la date par défaut afin d'effectuer des simulations
+def choixDate():
+    # Pour tester depuis le début de l'année
+    #return datetime.datetime(2021, 9, 1)
+    # Pour tester à la date actuelle
+    return datetime.datetime.today()
 
 import representant
 import admin
