@@ -23,7 +23,7 @@
                 <div class="col-sm-10">
                     <select name="formule" class="form-control" id="formule" disabled>
                         {% for formule in formules %}
-                        {% if enfant[3] == formule[0] %}
+                        {% if enfant[2] == formule[0] %}
                         <option value="{{ formule[0] }}" selected>{{ formule[1] }}</option>
                         {% else %}
                         <option value="{{ formule[0] }}">{{ formule[1] }}</option>

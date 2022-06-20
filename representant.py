@@ -132,6 +132,7 @@ def enfant(code_enfant):
                     i += 1
             if i == 0:
                 i = 5
+            print(i)
             cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (i, code_enfant, ))
 
             db.commit()
