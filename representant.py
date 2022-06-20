@@ -1,20 +1,4 @@
-from pickle import FALSE
 from main import *
-
-### ACCEUIL
-
-# @app.route('/accueil', methods = ["GET"])
-# @login_required
-# def accueil():
-#     db = get_db()
-#     cur = db.cursor()
-#     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-#     if user[0] == 'Representant':
-#         enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
-#         return render_template('R_accueil.html', enfants = enfants)
-#     if user[0] == 'Admin':
-#         return redirect(url_for('accueilAdmin'))
-#     return redirect(url_for('accueilEnseignant'))
 
 ### ACTU 
 
@@ -25,7 +9,7 @@ def actu():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant=?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         return render_template('R_accueil.html', enfants = enfants)
     if user[0] == 'Admin':
         return redirect(url_for('accueilAdmin'))
@@ -42,7 +26,7 @@ def ajoutRepas():
     if user[0] == 'Representant':
         now = datetime.datetime.today()
         newDate = now + datetime.timedelta(days = 2)
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         if request.method == "POST":
             date = datetime.datetime.strptime(request.form["repas"],'%Y-%m-%d')
             msg = None
@@ -109,7 +93,7 @@ def detailsFacture(code_mois):
         for repa in repas:
             dateInter.append(datetime.datetime.strptime(repa[0], '%Y-%m-%d').strftime('%A %d/%m/%Y'))
         representant = cur.execute("SELECT nom_representant, prenom_representant, code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[2], )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ? ORDER BY prenom_enfant", (representant[2], )).fetchall()
         date = datetime.datetime(int(year), int(code_mois), 1).strftime('%Y%m')
         return render_template('R_detailsFacture.html', now = now, repas = repas, representant = representant, enfants = enfants, date = date, dateInter = dateInter)
     if user[0] == 'Admin':
@@ -127,7 +111,7 @@ def enfant(code_enfant):
     if user[0] == 'Representant':
         representant = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
         enfant = cur.execute("SELECT nom_enfant, prenom_enfant, code_formule FROM Enfant WHERE code_representant = ? and code_enfant = ?", (representant[0], code_enfant, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ?", (representant[0], )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant WHERE code_representant = ? ORDER BY prenom_enfant", (representant[0], )).fetchall()
         formules = cur.execute("SELECT * FROM Formule").fetchall()
         joursManges = cur.execute("SELECT J.code_jour FROM Mange AS M INNER JOIN Jour AS J ON M.code_jour = J.code_jour WHERE M.code_enfant = ?", (code_enfant, )).fetchall()
         jours = cur.execute("SELECT * FROM Jour").fetchall()
@@ -140,13 +124,6 @@ def enfant(code_enfant):
             for allergie in allergies:
                 if request.form.getlist(allergie[1]):
                     cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (allergie[0], code_enfant,))
-            count = 0
-            for c in request.form["autre"]:
-                count += 1
-            if count > 0:
-                cur.execute("INSERT INTO Allergie(nom_allergie) VALUES (?)", (request.form["autre"],))
-                new_allergie = cur.execute("SELECT code_allergie FROM Allergie WHERE nom_allergie = ?", (request.form["autre"],)).fetchone()
-                cur.execute("INSERT INTO EstAllergiqueA VALUES (?,?)", (new_allergie[0], code_enfant,))
             i = 0
             for jour in jours:
                 if request.form.getlist(jour[1]):
@@ -179,7 +156,7 @@ def facture():
         year = datetime.datetime.today().year
         year1 = year - 1
         mois = datetime.datetime.today().month
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         if request.method == "POST":
             return redirect(url_for('detailsFacture', code_mois = request.form["facture"]))
         return render_template('R_facture.html', year = year, months = months, mois = mois ,year1 = year1, enfants = enfants)
@@ -198,7 +175,7 @@ def info():
     if user[0] == 'Representant':
         info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
         compte = cur.execute("SELECT * from Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         return render_template('R_info.html', info = info, compte = compte, enfants = enfants)
     if user[0] == 'Admin':
         return redirect(url_for('accueilAdmin'))
@@ -214,7 +191,7 @@ def info2():
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
         info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         if request.method== "POST": 
             user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
             if user:
@@ -244,7 +221,7 @@ def info3():
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
         info = cur.execute("SELECT * FROM Representant WHERE identifiant = ?",(flask_login.current_user.name, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         if request.method== "POST": 
             user = cur.execute("SELECT * FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
             if user: 
@@ -304,7 +281,7 @@ def menus():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ?", (flask_login.current_user.name, )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant FROM Enfant AS E INNER JOIN Representant AS R ON E.code_representant = R.code_representant WHERE R.identifiant = ? ORDER BY prenom_enfant", (flask_login.current_user.name, )).fetchall()
         return render_template('R_menu.html', enfants = enfants)
     if user[0] == 'Admin':
         return redirect(url_for('accueilAdmin'))
@@ -320,7 +297,7 @@ def repas():
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Representant':
         code_rep = cur.execute("SELECT code_representant FROM Representant WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
-        enfants = cur.execute("SELECT code_enfant, prenom_enfant, nom_enfant FROM Enfant WHERE code_representant = ?", (code_rep[0], )).fetchall()
+        enfants = cur.execute("SELECT code_enfant, prenom_enfant, nom_enfant FROM Enfant WHERE code_representant = ? ORDER BY prenom_enfant", (code_rep[0], )).fetchall()
         repas = []
         year = datetime.datetime.today().year
         year1 = year - 1
@@ -390,6 +367,7 @@ def formule(idJour, annee, code_enfant):
                         find = True
         if not find:
             cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date, code_enfant,))
+            print(date)
             find = False
     return
 

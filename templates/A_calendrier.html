@@ -1,41 +1,78 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    {% extends "A_layout.html" %}
-    {% block head %}
+  <head>
+    {% extends "A_layout.html" %} {% block head %}
     <title>CLG - Liste Classes</title>
     {% endblock %}
-</head>
+  </head>
 
-
-<body>
+  <body>
     {% block content %}
 
     <div class="container mt-3">
-        <a href="/ajoutVacances" class="btn btn-warning">Ajouter des vacances</a>
-        <table class="table table-striped mt-3">
-            <thead>
-                <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Supprimer</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set i = namespace (index = 0) %}
-                {% for conge in conges %}
-                <tr>
-                    <td>{{ date[i.index] }}</td>
-                    <td><a class="btn btn-warning" href="/annuleVacances/{{ conge[0] }}"
-                        onclick="if (confirm('Voulez-vous vraiment annuler le jour de congés ?')) commentDelete(1); return false">Annuler</a>
-                    </td>
-                </tr>
-                {% set i.index = i.index + 1 %}
-                {% endfor %}
-            </tbody>
-        </table>
+      <a href="/ajoutVacances" class="btn btn-warning">Ajouter des vacances</a>
+      <table class="table table-striped mt-3">
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Supprimer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set i = namespace (index = 0) %} {% for conge in conges %}
+          <tr>
+            <td>{{ date[i.index] }}</td>
+            <td>
+              <a
+                class="btn btn-warning"
+                href="/annuleVacances/{{ conge[0] }}"
+                onclick="if (confirm('Voulez-vous vraiment annuler le jour de congés ?')) commentDelete(1); return false"
+                >Annuler</a
+              >
+            </td>
+          </tr>
+          {% set i.index = i.index + 1 %} {% endfor %}
+        </tbody>
+      </table>
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          {% if page > 1 %}
+          <li class="page-item">
+            <a
+              class="page-link link-warning mb-3"
+              href="/calendrier?page={{ page - 1 }}"
+              >Previous</a
+            >
+          </li>
+          {% endif %} {% for page_number in list_of_page %} {% if page_number ==
+          page %}
+          <li class="page-item active">
+            <a
+              class="page-link link-warning mb-3"
+              href="/calendrier?page={{ page_number }}"
+              >{{ page_number }}</a
+            >
+          </li>
+          {% else %}
+          <li class="page-item">
+            <a
+              class="page-link link-warning mb-3"
+              href="/calendrier?page={{ page_number }}"
+              >{{ page_number }}</a
+            >
+          </li>
+          {% endif %} {% endfor %} {% if page < page_total %}
+          <li class="page-item">
+            <a
+              class="page-link link-warning mb-3"
+              href="/calendrier?page={{ page + 1 }}"
+              >Next</a
+            >
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
     </div>
     {% endblock %}
-</body>
-
+  </body>
 </html>

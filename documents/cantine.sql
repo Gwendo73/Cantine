@@ -230,18 +230,89 @@ CREATE TABLE IF NOT EXISTS Conge (
 ----------------------------------------------------------
 
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
-INSERT INTO Compte VALUES ('gartalle', 'test', 'Representant');
-INSERT INTO Compte VALUES ('clem', 'test', 'Representant');
-INSERT INTO Compte VALUES ('churson', 'churson', 'Representant');
-INSERT INTO Compte VALUES ('ajacquemin', 'test', 'Enseignant');
-INSERT INTO Compte VALUES ('jneymar', 'jneymar', 'Enseignant');
 
-INSERT INTO Enseignant VALUES (1, 'JACQUEMIN', 'Alexis', 'ajacquemin');
+
+INSERT INTO Compte VALUES ('gartalle', 'database', 'Representant');
+INSERT INTO Compte VALUES ('smic', 'smic', 'Representant');
+INSERT INTO Compte VALUES ('Z', 'Z', 'Representant');
+INSERT INTO Compte VALUES ('caro', 'julien', 'Representant');
+INSERT INTO Compte VALUES ('senlis', 'senlis', 'Representant');
+INSERT INTO Compte VALUES ('jdore', 'jdore', 'Representant');
+INSERT INTO Compte VALUES ('jbc', 'tb10', 'Representant');
+INSERT INTO Compte VALUES ('vdoppel', 'vdoppel', 'Representant');
+INSERT INTO Compte VALUES ('cdouche', 'cdouche', 'Representant');
+INSERT INTO Compte VALUES ('julien', 'caro', 'Representant');
+INSERT INTO Compte VALUES ('maestro', 'maestro', 'Representant');
+INSERT INTO Compte VALUES ('lgbtqq+', 'lgbtqq+', 'Representant');
+INSERT INTO Compte VALUES ('mgrim', 'mgrim', 'Representant');
+INSERT INTO Compte VALUES ('churson', 'churson', 'Representant');
+INSERT INTO Compte VALUES ('lilianne', 'feria', 'Representant');
+INSERT INTO Compte VALUES ('arnaud', 'arnaud', 'Representant');
+INSERT INTO Compte VALUES ('tonio', 'tonio', 'Representant');
+INSERT INTO Compte VALUES ('faou', 'faou', 'Representant');
+INSERT INTO Compte VALUES ('amontreuil', 'amontreuil', 'Representant');
+INSERT INTO Compte VALUES ('kr', 'kr', 'Representant');
+INSERT INTO Compte VALUES ('louisp', 'A350frvr', 'Representant');
+INSERT INTO Compte VALUES ('pelota', 'pelota', 'Representant');
+INSERT INTO Compte VALUES ('victine', 'victine', 'Representant');
+INSERT INTO Compte VALUES ('renard', 'agent', 'Representant');
+INSERT INTO Compte VALUES ('peppapig', 'basicfit<3', 'Representant');
+INSERT INTO Compte VALUES ('mtellier', 'mtellier', 'Representant');
+INSERT INTO Compte VALUES ('mtesta', 'mtesta', 'Representant');
+INSERT INTO Compte VALUES ('gendarme', 'gendarme', 'Representant');
+
+INSERT INTO Compte VALUES ('jkan', 'jkan', 'Enseignant');
+INSERT INTO Compte VALUES ('jneymar', 'jneymar', 'Enseignant');
+INSERT INTO Compte VALUES ('sdi', 'sdi', 'Enseignant');
+INSERT INTO Compte VALUES ('aterieur', 'aterieur', 'Enseignant');
+INSERT INTO Compte VALUES ('jcelere', 'jcelere', 'Enseignant');
+INSERT INTO Compte VALUES ('tdesavoie', 'tdesavoie', 'Enseignant');
+INSERT INTO Compte VALUES ('pchtron', 'pchtron', 'Enseignant');
+INSERT INTO Compte VALUES ('lbar', 'lbar', 'Enseignant');
+INSERT INTO Compte VALUES ('tlouest', 'tlouest', 'Enseignant');
+INSERT INTO Compte VALUES ('aere', 'aere', 'Enseignant');
+
+INSERT INTO Enseignant VALUES (1, 'KAN', 'Jerry', 'jkan');
 INSERT INTO Enseignant VALUES (2, 'NEYMAR', 'Jean', 'jneymar');
+INSERT INTO Enseignant VALUES (3, 'DI', 'Sam', 'sdi');
+INSERT INTO Enseignant VALUES (4, 'TERIEUR', 'Alain', 'aterieur');
+INSERT INTO Enseignant VALUES (5, 'CELERE', 'Jacques', 'jcelere');
+INSERT INTO Enseignant VALUES (6, 'DE SAVOIE', 'Tom', 'tdesavoie');
+INSERT INTO Enseignant VALUES (7, 'CHTRON', 'Paul', 'pchtron');
+INSERT INTO Enseignant VALUES (8, 'BAR', 'Lenny', 'lbar');
+INSERT INTO Enseignant VALUES (9, 'LOUEST', 'Thea', 'tlouest');
+INSERT INTO Enseignant VALUES (10, 'ERE', 'Axel', 'aere');
 
 INSERT INTO Representant VALUES (1, 'ARTALLE', 'Gwendal', '0647396010', 'gwendal.artalle73@gmail.com', 'gartalle');
-INSERT INTO Representant VALUES (2, 'PHILIPPE', 'Clementine', '0655108310', 'clemclem@gmail.com', 'clem');
-INSERT INTO Representant VALUES (3, 'HURSON', 'Cesar', '0625408670', 'cesar.hurson@dgac.fr', 'churson');
+INSERT INTO Representant VALUES (2, 'BEAUBOIS', 'Smic', '0625408670', 'smic@cannes.com', 'smic');
+INSERT INTO Representant VALUES (3, 'BERTOLONE', 'Darlann', '0625408670', 'darlann@flyinstinct.com', 'Z');
+INSERT INTO Representant VALUES (4, 'CHABAUD', 'Caro', '0625408580', 'pepita@orange.fr', 'caro');
+INSERT INTO Representant VALUES (5, 'CHAMBREY', 'Louis', '', 'lchambrey@boeing.us', 'senlis');
+INSERT INTO Representant VALUES (6, 'CLUZEL', 'Alexis', '', '', 'jdore');
+INSERT INTO Representant VALUES (7, 'COLIN', 'JB', '0625408670', 'jb_c@capgemini.com', 'jbc');
+INSERT INTO Representant VALUES (8, 'DOPPEL', 'Victor', '', '', 'vdoppel');
+INSERT INTO Representant VALUES (9, 'DOUCHE-UN', 'Clément', '', 'clement@airbus.fr', 'cdouche');
+INSERT INTO Representant VALUES (10, 'DUNEZ', 'Julien', '', 'pepito@acmtp.fr', 'julien');
+INSERT INTO Representant VALUES (11, 'GANDJY', 'Shayan', '', 'cesar.hurson@dgac.fr', 'maestro');
+INSERT INTO Representant VALUES (12, 'GIBERT', 'Timmy', '', 'timmy@lgbtqq.com', 'lgbtqq+');
+INSERT INTO Representant VALUES (13, 'GRIMONT', 'Mina', '', '', 'mgrim');
+INSERT INTO Representant VALUES (14, 'HURSON', 'Cesar', '0625408670', 'cesar.hurson@dgac.fr', 'churson');
+INSERT INTO Representant VALUES (15, 'JOUVE', 'Ilian', '0698708670', 'lilianne.jouve@wanadoo.fr', 'lilianne');
+INSERT INTO Representant VALUES (16, 'MONTE-LA-GARDE', 'Arnaud', '', 'arnaud@biereandsurf.fr', 'arnaud');
+INSERT INTO Representant VALUES (17, 'LEBRETON', 'Antoine', '', 'antoine@morbihan.bretagne', 'tonio');
+INSERT INTO Representant VALUES (18, 'MAMMERI', 'Faou', '', '', 'faou');
+INSERT INTO Representant VALUES (19, 'MONTREUIL', 'Alisée', '', '', 'amontreuil');
+INSERT INTO Representant VALUES (20, 'NGOUPAYOU', 'Kay-Rhane', '', '', 'kr');
+INSERT INTO Representant VALUES (21, 'PECHENAIR', 'Louis', '0635089457', 'pechenair@gmail.com', 'louisp');
+INSERT INTO Representant VALUES (22, 'PÉLOS', 'Alice', '0678910112', 'pelotpal@hotmail.fr', 'pelota');
+INSERT INTO Representant VALUES (23, 'PHILIPPE', 'Clémentine', '0677735003', 'viclem@enac.com', 'victine');
+INSERT INTO Representant VALUES (24, 'RATVEAU', 'Chloé', '0625408670', 'chloé.ratveau@enac.fr', 'renard');
+INSERT INTO Representant VALUES (25, 'ROUYER', 'Jarry', '0625438670', 'jeremy.muscle@basic-fit.com', 'peppapig');
+INSERT INTO Representant VALUES (26, 'TELLIER', 'Sylvie', '', '', 'mtellier');
+INSERT INTO Representant VALUES (27, 'TESTARODE', 'Mathieu', '', '', 'mtesta');
+INSERT INTO Representant VALUES (28, 'ZAMPIN', 'Piero', '', '', 'gendarme');
+
+
 
 INSERT INTO Tarif VALUES (1, 'Tarif de Base', 3.5);
 INSERT INTO Tarif VALUES (2, 'Tarif CAF', 2.8);
@@ -276,21 +347,44 @@ INSERT INTO Jour VALUES (2, 'Mardi');
 INSERT INTO Jour VALUES (3, 'Jeudi');
 INSERT INTO Jour VALUES (4, 'Vendredi');
 
+
+-- code_tarif integer NOT NULL,
+--   code_classe integer NOT NULL,
+--   code_representant integer NOT NULL,
+--   code_formule integer NOT NULL,
 INSERT INTO Enfant VALUES (1, 'ARTALLE', 'Pierre', 1, 1, 1, 1);
 INSERT INTO Enfant VALUES (2, 'ARTALLE', 'Paul', 1, 1, 1, 1);
 INSERT INTO Enfant VALUES (3, 'ARTALLE', 'Jacques', 1, 1, 1, 2);
-
-INSERT INTO Mange VALUES (1, 1);
-INSERT INTO Mange VALUES (2, 2);
-INSERT INTO Mange VALUES (3, 3);
-INSERT INTO Mange VALUES (4, 3);
+INSERT INTO Enfant VALUES (4, 'PHILIPPE', 'Kevin', 2, 8, 22, 4);
+INSERT INTO Enfant VALUES (5, 'PHILIPPE', 'Bryan', 2, 2, 22, 4);
+INSERT INTO Enfant VALUES (6, 'PHILIPPE', 'Dylan', 2, 4, 22, 4);
+INSERT INTO Enfant VALUES (7, 'PHILIPPE', 'Brandon', 5, 1, 22, 4);
+INSERT INTO Enfant VALUES (8, 'PHILIPPE', 'Tony', 2, 3, 22, 3);
+INSERT INTO Enfant VALUES (9, 'KROGMANN', 'Vanessa', 2, 2, 22, 3);
+INSERT INTO Enfant VALUES (10, 'KROGMANN', 'Ashley', 2, 1, 22, 3);
+INSERT INTO Enfant VALUES (11, 'KROGMANN', 'Brenda', 2, 6, 22, 3);
+INSERT INTO Enfant VALUES (12, 'KROGMANN', 'Cindy', 2, 4, 22, 3);
+INSERT INTO Enfant VALUES (13, 'KROGMANN', 'Samanta', 2, 1, 22, 3);
+INSERT INTO Enfant VALUES (14, 'DUNEZ', 'Pépito', 1, 2, 10, 1);
+INSERT INTO Enfant VALUES (15, 'CHABAUD', 'Pépita', 1, 8, 4, 1);
+INSERT INTO Enfant VALUES (16, 'HURSON', 'Petit', 1, 4, 14, 2);
+INSERT INTO Enfant VALUES (17, 'HURSON', 'Winnie', 1, 2, 14, 2);
+INSERT INTO Enfant VALUES (18, 'CHAMBREY', 'Senlis', 1, 7, 5, 2);
+INSERT INTO Enfant VALUES (19, 'CHAMBREY', 'Heineken', 1, 2, 5, 2);
+INSERT INTO Enfant VALUES (20, 'CHAMBREY', 'Bud', 1, 7, 5, 2);
+INSERT INTO Enfant VALUES (21, 'COLIN', 'Jean-Louis-Eude', 1, 2, 7, 2);
+INSERT INTO Enfant VALUES (22, 'COLIN', 'Marie-Eugenie-Sophie', 1, 7, 7, 2);
+INSERT INTO Enfant VALUES (23, 'PELOS', 'Jules', 1, 7, 7, 2);
 
 INSERT INTO Enseigne VALUES (1, 1);
+INSERT INTO Enseigne VALUES (2, 2);
+INSERT INTO Enseigne VALUES (3, 3);
+INSERT INTO Enseigne VALUES (4, 4);
+INSERT INTO Enseigne VALUES (5, 5);
+INSERT INTO Enseigne VALUES (6, 6);
+INSERT INTO Enseigne VALUES (7, 7);
+INSERT INTO Enseigne VALUES (8, 8);
 
-INSERT INTO Repas VALUES (1, '2022-06-16', 1);
-INSERT INTO Repas VALUES (2, '2022-06-16', 2);
-INSERT INTO Repas VALUES (3, '2022-06-16', 3);
-INSERT INTO Repas VALUES (4, '2022-06-17', 1);
 
 INSERT INTO Allergie VALUES (1, 'Gluten');
 INSERT INTO Allergie VALUES (2, 'Arachides');
@@ -299,6 +393,4 @@ INSERT INTO Allergie VALUES (4, 'Lactose');
 INSERT INTO Allergie VALUES (5, 'Oeufs');
 INSERT INTO Allergie VALUES (6, 'Fruits');
 
-INSERT INTO EstAllergiqueA VALUES (1, 1);
-
-INSERT INTO Conge VALUES ('2022-06-23')
+INSERT INTO Conge VALUES ('2022-06-20')
