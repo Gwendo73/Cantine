@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS Conge (
 INSERT INTO Compte VALUES ('admin', 'admin', 'Admin');
 
 -- Comptes Représentants
-INSERT INTO Compte VALUES ('gartalle', 'database', 'Representant');
+INSERT INTO Compte VALUES ('gartalle', 'test', 'Representant');
 INSERT INTO Compte VALUES ('smic', 'smic', 'Representant');
 INSERT INTO Compte VALUES ('Z', 'Z', 'Representant');
 INSERT INTO Compte VALUES ('caro', 'julien', 'Representant');
@@ -369,7 +369,7 @@ INSERT INTO Enfant VALUES (19, 'CHAMBREY', 'Heineken', 1, 2, 5, 5);
 INSERT INTO Enfant VALUES (20, 'CHAMBREY', 'Bud', 1, 7, 5, 5);
 INSERT INTO Enfant VALUES (21, 'COLIN', 'Jean-Louis-Eude', 1, 2, 7, 5);
 INSERT INTO Enfant VALUES (22, 'COLIN', 'Marie-Eugenie-Sophie', 1, 7, 7, 5);
-INSERT INTO Enfant VALUES (23, 'PELOS', 'Jules', 1, 7, 7, 5);
+INSERT INTO Enfant VALUES (23, 'PELOS', 'Jules', 1, 7, 22, 5);
 
 INSERT INTO Enseigne VALUES (1, 1);
 INSERT INTO Enseigne VALUES (2, 2);
@@ -387,4 +387,4 @@ INSERT INTO Allergie VALUES (4, 'Lactose');
 INSERT INTO Allergie VALUES (5, 'Oeufs');
 INSERT INTO Allergie VALUES (6, 'Fruits');
 
-INSERT INTO Conge VALUES ('2022-06-20')
+INSERT INTO Conge VALUES ('2022-06-30')

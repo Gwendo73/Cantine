@@ -1,4 +1,3 @@
-from sqlite3 import DataError
 from main import *
 
 ### ACTU 
@@ -133,7 +132,6 @@ def enfant(code_enfant):
                     i += 1
             if i == 0:
                 i = 5
-            print(i)
             cur.execute("UPDATE Enfant SET code_formule = ? WHERE code_enfant = ?", (i, code_enfant, ))
 
             db.commit()
@@ -355,13 +353,12 @@ def formule(idJour, annee, code_enfant):
         dates = pd.date_range(start=debut, end=fin, freq='W-THU').strftime('%Y-%m-%d').tolist()
     if idJour == 4:
         dates = pd.date_range(start=debut, end=fin, freq='W-FRI').strftime('%Y-%m-%d').tolist()
-    conges = cur.execute("SELECT * FROM Conge").fetchall()
+    conges = cur.execute("SELECT date_conge FROM Conge ORDER BY date_conge").fetchall()
     repas = cur.execute("SELECT date_repas FROM Repas WHERE code_enfant = ?", (code_enfant, )).fetchall()
-    print(dates)
     find = False
     for date in dates:
         for repa in repas:
-            if repa[0] == date:
+            if date == repa[0]:
                 find = True
             else:
                 for conge in conges:
@@ -369,8 +366,7 @@ def formule(idJour, annee, code_enfant):
                         find = True
         if not find:
             cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date, code_enfant,))
-            print(date)
-            find = False
+        find = False
     return
 
 

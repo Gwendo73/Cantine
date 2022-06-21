@@ -27,3 +27,7 @@ MDP : jneymar
 Representant  
 identifiant : gartalle  
 MDP : test
+
+## Date du jour
+Il est possible de changer la date actuelle  
+avec la fonction choixDate() ligne 96 dans le main.py afin de faire des tests sur une année scolaire (Aout/Année N - Juillet/Année N+1 )

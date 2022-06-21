@@ -1,4 +1,3 @@
-from sympy import true
 from main import *
 
 ### ACCEUIL ADMIN
@@ -73,6 +72,7 @@ def ajoutVacances():
                         break
                 if insert:
                     cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (new_date.strftime('%Y-%m-%d'), )) 
+
                     cur.execute("DELETE FROM Repas WHERE date_repas = ?", (new_date.strftime('%Y-%m-%d'), ))
                 insert = True
                 new_date += datetime.timedelta(days = 1)
@@ -108,11 +108,31 @@ def calendrier():
     cur = db.cursor()
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
+        ### Permet de set les mercredi, samedi, dimanche de l'année en tant que congés
+        # now = choixDate()
+        # anneeBis = now.year
+        # if now.month > 7:
+        #     anneeBis += 1
+        # debut = datetime.datetime(now.year, now.month, now.day).strftime('%m/%d/%Y')
+        # fin = datetime.datetime(anneeBis, 7, 15).strftime('%m/%d/%Y')
+        # dates = pd.date_range(start=debut, end=fin, freq='W-WED').strftime('%Y-%m-%d').tolist()
+        # for date in dates:
+        #     cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (date, )) 
+        #     cur.execute("DELETE FROM Repas WHERE date_repas = ?", (date, ))
+        # dates = pd.date_range(start=debut, end=fin, freq='W-SAT').strftime('%Y-%m-%d').tolist()
+        # for date in dates:
+        #     cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (date, )) 
+        #     cur.execute("DELETE FROM Repas WHERE date_repas = ?", (date, ))
+        # dates = pd.date_range(start=debut, end=fin, freq='W-SUN').strftime('%Y-%m-%d').tolist()
+        # for date in dates:
+        #     cur.execute("INSERT INTO Conge(date_conge) VALUES (?)", (date, ))
+        #     cur.execute("DELETE FROM Repas WHERE date_repas = ?", (date, ))
         page_size = 10
         page = int(request.args.get('page', '1'))
         now = choixDate().strftime('%Y-%m-%d')
         conges = cur.execute("SELECT * FROM Conge WHERE date_conge >= ? ORDER BY date_conge", (now, )).fetchall()
         date = []
+        db.commit()
         for conge in conges:
             date.append(datetime.datetime.strptime(conge[0], '%Y-%m-%d').strftime('%A %d/%m/%Y'))
         page_total = int(len(conges)/page_size) + 1
@@ -234,7 +254,7 @@ def detailsEnfant(code_enf):
             code = cur.execute("SELECT code_representant FROM Enfant WHERE code_enfant = ?", (code_enf, )).fetchone()
             return redirect(url_for('detailsFamille', code_rep = code[0]))
         tarifs = cur.execute("SELECT * FROM Tarif").fetchall()
-        classes = cur.execute("SELECT * FROM Classe").fetchall()
+        classes = cur.execute("SELECT C.code_classe, C.nom_classe, T.niveau_classe, T.type_classe FROM Classe AS C INNER JOIN TypeDeClasse AS T ON C.code_type = T.code_type ORDER BY C.code_type, C.nom_classe").fetchall()
         formules = cur.execute("SELECT * FROM Formule").fetchall()
         enfant = cur.execute("SELECT code_enfant, nom_enfant, prenom_enfant, code_tarif, code_classe, code_representant FROM Enfant WHERE code_enfant = ?", (code_enf,)).fetchone()
         return render_template('A_detailsEnfant.html', enfant = enfant, tarifs = tarifs, formules = formules, classes = classes)
@@ -543,7 +563,7 @@ def suppressionR(code_rep):
         cur.execute("DELETE FROM Representant WHERE code_representant = ?", (code_rep, ))
         cur.execute("DELETE FROM Enfant WHERE code_representant = ?", (code_rep, ))
         db.commit()
-        return redirect(url_for('infosFamilles'))
+        return redirect(url_for('infosFamille'))
     if user[0] == 'Enseignant':
         return redirect(url_for('accueilEnseignant'))
     return redirect(url_for('accueil'))
