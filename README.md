@@ -11,7 +11,7 @@
 export FLASK_APP=main  
 flask run
 
-Il est nécessaire de posséder les modules *flask*, *flask_login* et *flask_bcrypt*
+Il est nécessaire de posséder les modules *pandas*, *flask*, *flask_login* et *flask_bcrypt*
 
 ## Comptes
 Voici plusieurs comptes pour jouer avec la base de données
@@ -27,6 +27,8 @@ MDP : jneymar
 Representant  
 identifiant : gartalle  
 MDP : test
+
+Il y a d'autres comptes disponibles dans /documents/cantine.sql
 
 ## Date du jour
 Il est possible de changer la date actuelle  
