@@ -355,15 +355,16 @@ def formule(idJour, annee, code_enfant):
         dates = pd.date_range(start=debut, end=fin, freq='W-FRI').strftime('%Y-%m-%d').tolist()
     conges = cur.execute("SELECT date_conge FROM Conge ORDER BY date_conge").fetchall()
     repas = cur.execute("SELECT date_repas FROM Repas WHERE code_enfant = ?", (code_enfant, )).fetchall()
+    print(conges)
+    print(dates)
     find = False
     for date in dates:
         for repa in repas:
             if date == repa[0]:
                 find = True
-            else:
-                for conge in conges:
-                    if date == conge[0]:
-                        find = True
+        for conge in conges:
+            if date == conge[0]:
+                find = True
         if not find:
             cur.execute("INSERT INTO Repas(date_repas, code_enfant) VALUES (?,?)", (date, code_enfant,))
         find = False

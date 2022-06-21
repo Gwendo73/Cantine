@@ -468,7 +468,7 @@ def modifMDPE(code_ens):
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
         enseignant = cur.execute("SELECT identifiant FROM Enseignant WHERE code_enseignant = ?", (code_ens, )).fetchone()
-        password = bcrypt.generate_password_hash("test2")
+        password = bcrypt.generate_password_hash("test")
         cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, enseignant[0], ))
         db.commit()
         return redirect(url_for('detailsEnseignant', code_ens = code_ens))
@@ -486,7 +486,7 @@ def modifMDPR(code_rep):
     user = cur.execute("SELECT type_compte FROM Compte WHERE identifiant = ?", (flask_login.current_user.name, )).fetchone()
     if user[0] == 'Admin':
         representant = cur.execute("SELECT identifiant FROM Representant WHERE code_representant = ?", (code_rep, )).fetchone()
-        password = bcrypt.generate_password_hash("test2")
+        password = bcrypt.generate_password_hash("test")
         cur.execute("UPDATE Compte SET mot_de_passe = ? WHERE identifiant = ?", (password, representant[0], ))
         db.commit()
         return redirect(url_for('detailsFamille', code_rep = code_rep))
